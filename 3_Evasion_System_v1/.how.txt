@@ -19,3 +19,7 @@ Non appena arriva una risposta (o scade il timeout), il sistema assegna un punte
 - Se riceve un pacchetto con flag TCP RST (Reset): Il firewall o il server ci hanno bloccato. (Reward: -1)
 - Se riceve un pacchetto ICMP (es. Destination Unreachable): Il firewall ha intercettato il pacchetto ma la rotta è vietata. (Reward: -1)
 - Se scade il Timeout (Non arriva nulla): Il firewall ha applicato una regola di "Drop" silente. (Reward: -1)
+
+
+Su Mint:
+sudo tcpdump -i any src host 192.168.10.10 and tcp port 80 -nn

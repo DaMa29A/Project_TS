@@ -1,0 +1,41 @@
+MUTANDO TTL
+
+con analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=1.5)
+time.sleep(0.5)
+==================================================
+      REPORT FINALE - EVALUATION METRICS
+==================================================
+Campo protocollo testato:  ttl (Valori casuali 1-255)
+Totale pacchetti inviati:  50
+Evasion Success Rate:      86.0%
+ -> Connessioni Riuscite (SYN-ACK): 43
+ -> Blocchi Rilevati (RST/ICMP):   0
+ -> Drop Silenti (Timeout):         7
+==================================================
+
+con analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=2.5)
+time.sleep(0.5)
+==================================================
+      REPORT FINALE - EVALUATION METRICS
+==================================================
+Campo protocollo testato:  ttl (Valori casuali 1-255)
+Totale pacchetti inviati:  50
+Evasion Success Rate:      76.0%
+ -> Connessioni Riuscite (SYN-ACK): 38
+ -> Blocchi Rilevati (RST/ICMP):   0
+ -> Drop Silenti (Timeout):         12
+==================================================
+
+
+con analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=1.5)
+time.sleep(1.5)
+==================================================
+      REPORT FINALE - EVALUATION METRICS
+==================================================
+Campo protocollo testato:  ttl (Valori casuali 1-255)
+Totale pacchetti inviati:  50
+Evasion Success Rate:      74.0%
+ -> Connessioni Riuscite (SYN-ACK): 37
+ -> Blocchi Rilevati (RST/ICMP):   0
+ -> Drop Silenti (Timeout):         13
+==================================================

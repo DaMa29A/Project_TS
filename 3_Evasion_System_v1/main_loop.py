@@ -13,7 +13,7 @@ conf.verb = 0
 # Configurazioni del Target di Test
 TARGET_IP = "192.168.20.10"
 TARGET_PORT = 80
-NUM_TESTS = 50  # Numero di cicli di mutazione da eseguire
+NUM_TESTS = 10  # Numero di cicli di mutazione da eseguire
 
 def get_dummy_strategy() -> MutationStrategy:
     """
@@ -38,7 +38,7 @@ def run_evasion_loop():
     timeout_count = 0
 
     # Inizializzazione del modulo Feedback Analyzer
-    analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=1.5)
+    analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=3.5)
 
     for i in range(1, NUM_TESTS + 1):
         print(f"--- Iterazione {i}/{NUM_TESTS} ---")
@@ -70,7 +70,7 @@ def run_evasion_loop():
                 fallimenti += 1
             
         # Breve pausa (Jitter) prima della prossima iterazione per non saturare la coda di rete
-        time.sleep(0.5)
+        time.sleep(3.5)
 
     # Calcolo dell'Evasion Success Rate (Metrica di valutazione finale)
     evasion_success_rate = (successi / NUM_TESTS) * 100
