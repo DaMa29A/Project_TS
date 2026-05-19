@@ -1,0 +1,11 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    padding: 20px;
+}
+h1 { color: #d9534f; }
+nav ul { list-style-type: none; padding: 0; }
+nav li { display: inline; margin-right: 15px; }
+a { color: #0275d8; text-decoration: none; }
+img { border: 2px solid #333; border-radius: 8px; margin-top: 20px; }

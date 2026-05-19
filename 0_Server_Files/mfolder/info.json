@@ -1,0 +1,6 @@
+{
+  "target_name": "Evasion Target Alpha",
+  "status": "active",
+  "vulnerability_mock": true,
+  "data": [10, 20, 30]
+}

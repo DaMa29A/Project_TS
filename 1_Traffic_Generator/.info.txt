@@ -1,0 +1,21 @@
+HTTPS requests:
+default value: HTTPS_RATIO = 0.7
+disable: HTTPS_RATIO = 0.0
+
+
+Note:
+- per HTTPS con certificato self-signed:
+  - curl usa -k
+  - chrome usa --ignore-certificate-errors
+
+
+Quando catturi con pfsense metti:
+- LAN
+- Sotto Untagged Filter metti :
+  - [Any of] 192.168.20.10 192.168.10.10 sopra HOST IP ADDRESS OR SUBNET
+  - [Any of] 80 443 sopra PORT NUMBER 
+
+Cattura tcdump su mint:
+sudo tcpdump -ni ens33 -U -w - '(host 192.168.20.10 and (port 80 or port 443))' | tee capture.pcap | tcpdump -nr -
+oppure solo http:
+sudo tcpdump -ni ens33 -U -w - 'host 192.168.20.10 and port 80' | tee capture.pcap | tcpdump -nr -

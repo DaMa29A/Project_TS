@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /mfolder/info.json
+Disallow: /mfolder/cat.jpg
