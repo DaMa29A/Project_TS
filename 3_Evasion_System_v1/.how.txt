@@ -1,0 +1,21 @@
+Questo script implementa l'architettura di base dell'intero sistema di evasione in un ciclo chiuso fittizio. 
+Il suo scopo non è usare l'intelligenza artificiale, ma verifica che attaccante, firewall e server
+riescano a parlarsi (e a bloccarsi) correttamente. 
+Isola i problemi di rete dai problemi di programmazione dell'IA.
+
+Invece di interrogare un modello AI vero e proprio il modulo protocol_mutator.py bypassa l'intelligenza e 
+inietta una strategia "hardcoded" (fissa).
+Lo script utilizza Scapy per creare un pacchetto di rete da zero. 
+Crea un pacchetto IP, ci aggancia sopra un segmento TCP con il flag SYN attivato (per aprire una connessione verso la porta 80) 
+e, prima di chiuderlo, applica fisicamente la mutazione decisa al punto precedente (forza il TTL=128 es).
+
+Il main_loop.py, utilizzando una funzione speciale di Scapy chiamata sr1 (Send and Receive 1), esegue due azioni 
+contemporaneamente e in modo sincronizzato:
+- Invia il pacchetto mutato verso il bersaglio.
+- Si mette immediatamente in "sniffing" (ascolto) aspettando una singola risposta di ritorno per un tempo massimo di 2 secondi.
+
+Non appena arriva una risposta (o scade il timeout), il sistema assegna un punteggio (+1 o -1) 
+- Se riceve un pacchetto con flag TCP SYN-ACK: il target ha accettato la connessione. (Reward: +1)
+- Se riceve un pacchetto con flag TCP RST (Reset): Il firewall o il server ci hanno bloccato. (Reward: -1)
+- Se riceve un pacchetto ICMP (es. Destination Unreachable): Il firewall ha intercettato il pacchetto ma la rotta è vietata. (Reward: -1)
+- Se scade il Timeout (Non arriva nulla): Il firewall ha applicato una regola di "Drop" silente. (Reward: -1)
