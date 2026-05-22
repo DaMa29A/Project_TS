@@ -1,0 +1,23 @@
+# Environment
+python -m venv .venv
+.venv\Scripts\activate  [Su linux -> source .venv/bin/activate]
+                        [which python       Deve puntare a .venv per assicurarti che è attivo]
+
+# Requirements
+pip freeze > requirements.txt
+pip install -r requirements.txt
+
+# Eseguire come amministratore il programma
+sudo .venv/bin/python main.py
+
+############################# OLLAMA #############################
+Ping verso window (VmNet1):
+ping -c1 192.168.98.1
+ping -c1 192.168.174.0
+
+Per ollama su win:
+$env:OLLAMA_HOST="0.0.0.0:11434"
+ollama serve
+
+Poi qui:
+curl http://192.168.98.1:11434/api/tags

@@ -1,41 +1,23 @@
-MUTANDO TTL
-
-con analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=1.5)
-time.sleep(0.5)
-==================================================
-      REPORT FINALE - EVALUATION METRICS
-==================================================
 Campo protocollo testato:  ttl (Valori casuali 1-255)
 Totale pacchetti inviati:  50
-Evasion Success Rate:      86.0%
- -> Connessioni Riuscite (SYN-ACK): 43
+Evasion Success Rate:      100.0%
+ -> Connessioni Riuscite (SYN-ACK): 50
  -> Blocchi Rilevati (RST/ICMP):   0
- -> Drop Silenti (Timeout):         7
+ -> Drop Silenti (Timeout):         0
 ==================================================
 
-con analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=2.5)
-time.sleep(0.5)
-==================================================
-      REPORT FINALE - EVALUATION METRICS
-==================================================
-Campo protocollo testato:  ttl (Valori casuali 1-255)
+Campo protocollo testato:  win_size (Valori casuali 0-65535)
 Totale pacchetti inviati:  50
-Evasion Success Rate:      76.0%
- -> Connessioni Riuscite (SYN-ACK): 38
+Evasion Success Rate:      100.0%
+ -> Connessioni Riuscite (SYN-ACK): 50
  -> Blocchi Rilevati (RST/ICMP):   0
- -> Drop Silenti (Timeout):         12
+ -> Drop Silenti (Timeout):         0
 ==================================================
 
-
-con analyzer = FeedbackAnalyzer(target_ip=TARGET_IP, timeout=1.5)
-time.sleep(1.5)
-==================================================
-      REPORT FINALE - EVALUATION METRICS
-==================================================
-Campo protocollo testato:  ttl (Valori casuali 1-255)
+Campo protocollo testato:  seq_num (Valori casuali 0 - 4.2B)
 Totale pacchetti inviati:  50
-Evasion Success Rate:      74.0%
- -> Connessioni Riuscite (SYN-ACK): 37
+Evasion Success Rate:      100.0%
+ -> Connessioni Riuscite (SYN-ACK): 50
  -> Blocchi Rilevati (RST/ICMP):   0
- -> Drop Silenti (Timeout):         13
+ -> Drop Silenti (Timeout):         0
 ==================================================

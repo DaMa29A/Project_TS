@@ -22,4 +22,4 @@ Non appena arriva una risposta (o scade il timeout), il sistema assegna un punte
 
 
 Su Mint:
-sudo tcpdump -i any src host 192.168.10.10 and tcp port 80 -nn
+sudo tcpdump -i any host 192.168.10.10 and tcp port 80 -nn
