@@ -57,7 +57,7 @@ class LLMEvasionStrategyEngine:
                 '  "reasoning": "<short chain-of-thought explanation of why you chose this>"\n'
                 "}\n"
             )),
-            *self.history[-10:], # Teniamo gli ultimi 10 messaggi di storia
+            *self.history[-5:], # Teniamo gli ultimi 5 messaggi di storia
             current_human_message
         ]
 
@@ -80,6 +80,8 @@ class LLMEvasionStrategyEngine:
                 new_value=strategy_dict.get("new_value", "error_missing_value"),
                 reasoning=strategy_dict.get("reasoning", "System Error: No reasoning provided by LLM.")
             )
+
+            strategy_obj = self._normalize_strategy(strategy_obj)
             
             # Salviamo il VERO contesto nella cronologia per mantenere memoria del feedback
             self.history.append(current_human_message)
@@ -95,3 +97,24 @@ class LLMEvasionStrategyEngine:
                 new_value="invalid_format", 
                 reasoning="System Error: Failed to parse LLM output. The LLM did not output a valid JSON."
             )
+    
+    def _normalize_strategy(self, strategy: MutationStrategy) -> MutationStrategy:
+        print(f"Before normalization: {strategy}")
+        if strategy.field_to_mutate == "flags" and isinstance(strategy.new_value, str):
+            raw_flags = strategy.new_value.upper()
+            flag_map = {
+                'SYN': 'S', 'ACK': 'A', 'FIN': 'F', 'RST': 'R',
+                'PSH': 'P', 'URG': 'U', 'ECE': 'E', 'CWR': 'C'
+            }
+            # Crea un pattern dinamico: r'\b(SYN|ACK|FIN|RST|PSH|URG|ECE|CWR)\b'
+            pattern = r'\b(' + '|'.join(flag_map.keys()) + r')\b'
+            
+            # Cerca tutte le occorrenze esatte nel testo
+            found_words = re.findall(pattern, raw_flags)
+            if found_words:
+                # Mappa le parole trovate nei caratteri Scapy (usando un set per evitare duplicati come "SS")
+                normalized = "".join(set(flag_map[word] for word in found_words))
+                strategy.new_value = normalized
+        print(f"After normalization: {strategy}")
+        return strategy
+            
