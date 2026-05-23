@@ -13,6 +13,7 @@ class LLMEvasionStrategyEngine:
             temperature=0.9,
             top_p=0.95,
             repeat_penalty=1.15,
+            format="json"
         )
 
         self.history = []
@@ -33,7 +34,7 @@ class LLMEvasionStrategyEngine:
         current_human_message = HumanMessage(content=(
             f"BASELINE TRAFFIC PROFILE:\n{baseline_info}\n\n"
             f"LAST DROP FEEDBACK:\n{feedback_info}\n\n"
-            "Based on the BASELINE TRAFFIC PROFILE and the LAST DROP FEEDBACK, decide whether to mutate 'TTL' or 'WindowSize'. "
+            "Based on the BASELINE TRAFFIC PROFILE and the LAST DROP FEEDBACK, decide which field to mutate among 'ttl', 'win_size', 'seq_num', or 'flags'. "
             "Generate the JSON for the next mutation strategy."
         ))
 
@@ -42,22 +43,34 @@ class LLMEvasionStrategyEngine:
             SystemMessage(content=(
                 "You are an expert Red Teamer.\n\n"
                 "Your objective is to generate dynamic protocol mutations to evade detection.\n"
-                "You can mutate the following fields:\n"
-                "- 'TTL'\n"
-                "- 'WindowSize'\n"
-                "- 'UserAgent'\n\n"
+                "You can mutate ONLY ONE of the following fields at a time:\n"
+                "- 'ttl' (Integer, IP Time-To-Live)\n"
+                "- 'win_size' (Integer, TCP Window Size)\n"
+                "- 'seq_num' (Integer, TCP Sequence Number)\n"
+                "- 'flags' (String, TCP Flags)\n\n"
                 "Constraints:\n"
                 "1. Output ONLY a valid JSON object. No markdown, no intro, no outro.\n"
                 "2. Use this exact schema:\n"
                 "{\n"
-                '  "field_to_mutate": "TTL", "WindowSize", or "UserAgent",\n'
-                '  "new_value": <integer for TTL/WindowSize, string for UserAgent>,\n'
+                '  "field_to_mutate": "<must be exactly one of: ttl, win_size, seq_num, flags>",\n'
+                '  "new_value": <integer for ttl/win_size/seq_num, string for flags>,\n'
                 '  "reasoning": "<short chain-of-thought explanation of why you chose this>"\n'
                 "}\n"
             )),
             *self.history[-10:], # Teniamo gli ultimi 10 messaggi di storia
             current_human_message
         ]
+
+        # --- AGGIUNTA PER STAMPARE IL PROMPT ---
+        print("\n" + "="*50)
+        print("🔍 PROMPT INVIATO ALL'LLM IN QUESTA ITERAZIONE:")
+        print("="*50)
+        for msg in messages:
+            # Estraiamo il tipo di messaggio (SystemMessage, HumanMessage, AIMessage)
+            tipo_messaggio = msg.__class__.__name__
+            print(f"[{tipo_messaggio}]:\n{msg.content}\n" + "-"*30)
+        print("="*50 + "\n")
+        # ---------------------------------------
 
         # 4. Chiamata all'LLM
         result = self.llm.invoke(messages)
@@ -74,9 +87,9 @@ class LLMEvasionStrategyEngine:
             
             # Creiamo l'oggetto strutturato invece di un semplice dizionario
             strategy_obj = MutationStrategy(
-                field_to_mutate=strategy_dict.get("field_to_mutate", "TTL"),
-                new_value=strategy_dict.get("new_value", 64),
-                reasoning=strategy_dict.get("reasoning", "No reasoning provided.")
+                field_to_mutate=strategy_dict.get("field_to_mutate", "error_missing_field"),
+                new_value=strategy_dict.get("new_value", "error_missing_value"),
+                reasoning=strategy_dict.get("reasoning", "System Error: No reasoning provided by LLM.")
             )
             
             # Salviamo il VERO contesto nella cronologia per mantenere memoria del feedback
@@ -87,9 +100,9 @@ class LLMEvasionStrategyEngine:
             
         except json.JSONDecodeError:
             print(f"Error decoding JSON from LLM: {raw_output}")
-            # Fallback robusto in caso di allucinazioni dell'LLM
+            # Fallback in caso di allucinazioni dell'LLM
             return MutationStrategy(
-                field_to_mutate="TTL", 
-                new_value=64, 
-                reasoning="Fallback strategy due to LLM JSON formatting error."
+                field_to_mutate="error_json_decode", 
+                new_value="invalid_format", 
+                reasoning="System Error: Failed to parse LLM output. The LLM did not output a valid JSON."
             )

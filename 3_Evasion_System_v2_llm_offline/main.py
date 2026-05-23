@@ -5,7 +5,7 @@ from models import NetworkFeedback
 from utils import load_json
 
 # --- CONFIGURAZIONI ---
-MAX_ATTEMPTS = 1
+MAX_ATTEMPTS = 2
 
 
 def main():
