@@ -99,8 +99,8 @@ class LLMEvasionStrategyEngine:
             )
     
     def _normalize_strategy(self, strategy: MutationStrategy) -> MutationStrategy:
-        print(f"Before normalization: {strategy}")
         if strategy.field_to_mutate == "flags" and isinstance(strategy.new_value, str):
+            print(f"Before normalization: {strategy}")
             raw_flags = strategy.new_value.upper()
             flag_map = {
                 'SYN': 'S', 'ACK': 'A', 'FIN': 'F', 'RST': 'R',
@@ -115,6 +115,5 @@ class LLMEvasionStrategyEngine:
                 # Mappa le parole trovate nei caratteri Scapy (usando un set per evitare duplicati come "SS")
                 normalized = "".join(set(flag_map[word] for word in found_words))
                 strategy.new_value = normalized
-        print(f"After normalization: {strategy}")
         return strategy
             
