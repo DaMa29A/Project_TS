@@ -9,8 +9,8 @@ BASELINE_JSON = INPUT_DIR / "baseline_stats.json"
 RL_MEMORY = RL_DIR / "rl_memory.joblib"
 
 # ---  OLLAMA API ---
-# OLLAMA_IP = "192.168.98.1"    # KALI
-OLLAMA_IP = "127.0.0.1"         # WIN
+OLLAMA_IP = "192.168.174.1"    # KALI
+# OLLAMA_IP = "127.0.0.1"         # WIN
 OLLAMA_PORT = "11434"
 OLLAMA_BASE_URL = f"http://{OLLAMA_IP}:{OLLAMA_PORT}"
 OLLAMA_URL = f"{OLLAMA_BASE_URL}/api/generate"

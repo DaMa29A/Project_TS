@@ -12,12 +12,11 @@ sudo .venv/bin/python main.py
 
 ############################# OLLAMA #############################
 Ping verso window (VmNet1):
-ping -c1 192.168.98.1
-ping -c1 192.168.174.0
+ping -c1 192.168.174.1      [Indirizzo VmNet1 ma con ultima cifra pari a 1 invece di 0]
 
 Per ollama su win:
 $env:OLLAMA_HOST="0.0.0.0:11434"
 ollama serve
 
 Poi qui:
-curl http://192.168.98.1:11434/api/tags
+curl http://192.168.174.1:11434/api/tags

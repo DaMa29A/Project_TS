@@ -1,0 +1,146 @@
+--- Inizializzazione LLM Evasion Engine ---
+
+[RL Classifier] Nessun file '/home/kali/Scrivania/Github Repos/Project_TS/3_Evasion_System_v5/rl/rl_memory.joblib' trovato. Inizializzazione da zero.
+--- TEST 1 ---
+Before normalization: field_to_mutate='win_size' new_value=65535 reasoning="Given that the maximum window size observed in baseline traffic is around 65,000, increasing it to its theoretical maximum (65,535) can help evade detection by potentially altering the anomaly detection models' confidence in identifying malicious activity."
+After normalization: field_to_mutate='win_size' new_value=65535 reasoning="Given that the maximum window size observed in baseline traffic is around 65,000, increasing it to its theoretical maximum (65,535) can help evade detection by potentially altering the anomaly detection models' confidence in identifying malicious activity."
+Generated Strategy: field_to_mutate='win_size' new_value=65535 reasoning="Given that the maximum window size observed in baseline traffic is around 65,000, increasing it to its theoretical maximum (65,535) can help evade detection by potentially altering the anomaly detection models' confidence in identifying malicious activity."
+Latenza LLM: 20.60 secondi
+Probability of Success: 50%
+[Mutator] Mutazione applicata: TCP Window Size = 65535
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 2 ---
+Before normalization: field_to_mutate='flags' new_value='PAFA' reasoning="Given that 'PA' and 'FA' are among the top flag combinations in baseline traffic, adding 'A' to this combination can increase its rarity while maintaining a level of similarity with existing patterns. This may help evade detection by making the anomaly detection models less confident in identifying malicious activity."
+After normalization: field_to_mutate='flags' new_value='PAFA' reasoning="Given that 'PA' and 'FA' are among the top flag combinations in baseline traffic, adding 'A' to this combination can increase its rarity while maintaining a level of similarity with existing patterns. This may help evade detection by making the anomaly detection models less confident in identifying malicious activity."
+Generated Strategy: field_to_mutate='flags' new_value='PAFA' reasoning="Given that 'PA' and 'FA' are among the top flag combinations in baseline traffic, adding 'A' to this combination can increase its rarity while maintaining a level of similarity with existing patterns. This may help evade detection by making the anomaly detection models less confident in identifying malicious activity."
+Latenza LLM: 52.61 secondi
+Probability of Success: 50%
+[Mutator] Mutazione applicata: TCP Flags = [PAFA]
+[-] Risposte inattese o fuori standard. Assumo fallimento. Reward: -1
+Feedback: BLOCK -> -1
+
+
+--- TEST 3 ---
+Before normalization: field_to_mutate='seq_num' new_value=30000 reasoning="Given that the sequence number entropy is relatively low in baseline traffic, increasing its value to a much higher range (30,000) can potentially disrupt the prediction models' accuracy. This may help evade detection by making it more challenging for anomaly detectors to identify malicious activity."
+After normalization: field_to_mutate='seq_num' new_value=30000 reasoning="Given that the sequence number entropy is relatively low in baseline traffic, increasing its value to a much higher range (30,000) can potentially disrupt the prediction models' accuracy. This may help evade detection by making it more challenging for anomaly detectors to identify malicious activity."
+Generated Strategy: field_to_mutate='seq_num' new_value=30000 reasoning="Given that the sequence number entropy is relatively low in baseline traffic, increasing its value to a much higher range (30,000) can potentially disrupt the prediction models' accuracy. This may help evade detection by making it more challenging for anomaly detectors to identify malicious activity."
+Latenza LLM: 56.79 secondi
+Probability of Success: 50%
+[Mutator] Mutazione applicata: TCP Sequence Number = 30000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 4 ---
+Before normalization: field_to_mutate='ttl' new_value=128 reasoning='Given that the TTL is consistently around 63 in baseline traffic, slightly increasing it to a value of 128 can create some variability and potentially disrupt any prediction models relying on this attribute.'
+After normalization: field_to_mutate='ttl' new_value=128 reasoning='Given that the TTL is consistently around 63 in baseline traffic, slightly increasing it to a value of 128 can create some variability and potentially disrupt any prediction models relying on this attribute.'
+Generated Strategy: field_to_mutate='ttl' new_value=128 reasoning='Given that the TTL is consistently around 63 in baseline traffic, slightly increasing it to a value of 128 can create some variability and potentially disrupt any prediction models relying on this attribute.'
+Latenza LLM: 90.65 secondi
+Probability of Success: 50%
+[Mutator] Mutazione applicata: IP TTL = 128
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 5 ---
+Before normalization: field_to_mutate='win_size' new_value=30000 reasoning='Given that the window size is consistently high in baseline traffic, significantly increasing it to a value of 30000 can create some variability and potentially disrupt any prediction models relying on this attribute.'
+After normalization: field_to_mutate='win_size' new_value=30000 reasoning='Given that the window size is consistently high in baseline traffic, significantly increasing it to a value of 30000 can create some variability and potentially disrupt any prediction models relying on this attribute.'
+Generated Strategy: field_to_mutate='win_size' new_value=30000 reasoning='Given that the window size is consistently high in baseline traffic, significantly increasing it to a value of 30000 can create some variability and potentially disrupt any prediction models relying on this attribute.'
+Latenza LLM: 94.98 secondi
+Probability of Success: 50%
+[Mutator] Mutazione applicata: TCP Window Size = 30000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 6 ---
+Before normalization: field_to_mutate='flags' new_value='RST|ACK' reasoning='Given that flags combinations like PA and FA are dominant, introducing a new flag combination with RST and ACK can add some variability to the traffic flow.'
+After normalization: field_to_mutate='flags' new_value='AR' reasoning='Given that flags combinations like PA and FA are dominant, introducing a new flag combination with RST and ACK can add some variability to the traffic flow.'
+Generated Strategy: field_to_mutate='flags' new_value='AR' reasoning='Given that flags combinations like PA and FA are dominant, introducing a new flag combination with RST and ACK can add some variability to the traffic flow.'
+Latenza LLM: 95.10 secondi
+Probability of Success: 98%
+[Mutator] Mutazione applicata: TCP Flags = [AR]
+[-] DROP/Timeout. Nessuna risposta utile. Reward: -1
+Feedback: BLOCK -> -1
+
+
+--- TEST 7 ---
+Before normalization: field_to_mutate='seq_num' new_value=56789 reasoning='Given that the sequence number has a relatively low entropy value of 0.997, introducing an unusually high value such as 56789 can help break any potential patterns or predictions being used by the firewall.'
+After normalization: field_to_mutate='seq_num' new_value=56789 reasoning='Given that the sequence number has a relatively low entropy value of 0.997, introducing an unusually high value such as 56789 can help break any potential patterns or predictions being used by the firewall.'
+Generated Strategy: field_to_mutate='seq_num' new_value=56789 reasoning='Given that the sequence number has a relatively low entropy value of 0.997, introducing an unusually high value such as 56789 can help break any potential patterns or predictions being used by the firewall.'
+Latenza LLM: 99.75 secondi
+Probability of Success: 28%
+[Mutator] Mutazione applicata: TCP Sequence Number = 56789
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 8 ---
+Before normalization: field_to_mutate='ttl' new_value=65 reasoning='Given that the TTL has a relatively low mean and stdev value, increasing it to 65 can create some variability in the packet flow.'
+After normalization: field_to_mutate='ttl' new_value=65 reasoning='Given that the TTL has a relatively low mean and stdev value, increasing it to 65 can create some variability in the packet flow.'
+Generated Strategy: field_to_mutate='ttl' new_value=65 reasoning='Given that the TTL has a relatively low mean and stdev value, increasing it to 65 can create some variability in the packet flow.'
+Latenza LLM: 89.88 secondi
+Probability of Success: 58%
+[Mutator] Mutazione applicata: IP TTL = 65
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 9 ---
+Before normalization: field_to_mutate='win_size' new_value=65000 reasoning="Given that the window size has a high max value and relatively low entropy, increasing it to 65000 can potentially overwhelm the firewall's detection capabilities."
+After normalization: field_to_mutate='win_size' new_value=65000 reasoning="Given that the window size has a high max value and relatively low entropy, increasing it to 65000 can potentially overwhelm the firewall's detection capabilities."
+Generated Strategy: field_to_mutate='win_size' new_value=65000 reasoning="Given that the window size has a high max value and relatively low entropy, increasing it to 65000 can potentially overwhelm the firewall's detection capabilities."
+Latenza LLM: 93.59 secondi
+Probability of Success: 86%
+[Mutator] Mutazione applicata: TCP Window Size = 65000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+Feedback: PASS -> 1
+
+
+--- TEST 10 ---
+Before normalization: field_to_mutate='flags' new_value='RST|ACK' reasoning='Given that the top flags combinations are mostly limited to A, PA, FA, S, and SA, introducing a combination like RST|ACK can potentially disrupt any established connections and create opportunities for evasion.'
+After normalization: field_to_mutate='flags' new_value='AR' reasoning='Given that the top flags combinations are mostly limited to A, PA, FA, S, and SA, introducing a combination like RST|ACK can potentially disrupt any established connections and create opportunities for evasion.'
+Generated Strategy: field_to_mutate='flags' new_value='AR' reasoning='Given that the top flags combinations are mostly limited to A, PA, FA, S, and SA, introducing a combination like RST|ACK can potentially disrupt any established connections and create opportunities for evasion.'
+Latenza LLM: 98.40 secondi
+Probability of Success: 98%
+[Mutator] Mutazione applicata: TCP Flags = [AR]
+[-] DROP/Timeout. Nessuna risposta utile. Reward: -1
+Feedback: BLOCK -> -1
+
+
+
+[RL Classifier] Creata nuova directory per il salvataggio: '/home/kali/Scrivania/Github Repos/Project_TS/3_Evasion_System_v5/rl'
+
+[RL Classifier] Stato salvato con successo (10 campioni).
+==================================================
+📊 REPORT FINALE DELLA SESSIONE
+==================================================
+Evasion Success Rate : 70.0% (7 successi su 10 tentativi)
+Latenza Media LLM    : 79.23 secondi per iterazione
+Stato RL Globale     : Campioni Totali: 10 | Evasion Rate Totale: 70.0% | Evasion Rate (Recent [Last 50]): 70.0%
+==================================================
+
+
+
+
+
+
+TARGET_OUTPUT:
+17:24:54.601341 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 3323860548, win 65535, length 0
+17:24:54.603805 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 3323860549, win 0, length 0
+17:25:49.714357 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [FP.], seq 3323860548, ack 0, win 65535, length 0
+17:26:49.035656 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 30000, win 65535, length 0
+17:26:49.037404 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 30001, win 0, length 0
+17:28:22.245067 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 30000, win 65535, length 0
+17:28:22.247343 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 30001, win 0, length 0
+17:29:59.728436 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 30000, win 30000, length 0
+17:29:59.730805 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 30001, win 0, length 0
+17:33:19.749130 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 56789, win 30000, length 0
+17:33:19.751081 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 56790, win 0, length 0
+17:34:52.238911 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 56789, win 30000, length 0
+17:34:52.241629 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 56790, win 0, length 0
+17:36:28.382107 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [S], seq 56789, win 65000, length 0
+17:36:28.384337 ens33 In  IP 192.168.10.10.9765 > 192.168.20.10.80: Flags [R], seq 56790, win 0, length 0
