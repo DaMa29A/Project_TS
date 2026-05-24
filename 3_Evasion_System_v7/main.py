@@ -15,7 +15,7 @@ from utils import load_json
 MAX_ATTEMPTS = 2
 
 def orchestrator_loop(proxy):
-    print("[Orchestratore] Attendo 1.5 secondi per l'avvio della coda NFQueue...")
+    print("[orchestrator_loop] Attendo 1.5 secondi per l'avvio della coda NFQueue...")
     time.sleep(1.5) 
 
     print("--- Inizializzazione LLM Evasion Engine ---")
@@ -107,7 +107,6 @@ def orchestrator_loop(proxy):
 
             i += 1
             print(f"\n")
-
             
         # Salvataggio dello stato
         proxy.classifier.save_state()
@@ -145,7 +144,7 @@ def main():
     
     # Avviamo l'ascolto sul thread principale
     try:
-        print("[*] Evasion Engine V6 in attesa sulla coda 1...")
+        print("[*] Evasion Engine in attesa sulla coda 1...")
         nfqueue.run() # Questo blocca finché non arriva il segnale os.kill()
     except KeyboardInterrupt:
         print("\n[*] Chiusura forzata dell'engine completata con successo.")

@@ -31,8 +31,8 @@ class RLMutationClassifier:
         features['seq_num'] = float(state.seq_num)
 
         # Feature Hashing per le stringhe (Flags e User-Agent)
-        hash_flags = int(hashlib.md5(state.flags.encode('utf-8')).hexdigest(), 16) % 10000
-        features['flags_encoded'] = float(hash_flags)
+        # hash_flags = int(hashlib.md5(state.flags.encode('utf-8')).hexdigest(), 16) % 10000
+        # features['flags_encoded'] = float(hash_flags)
         
         # hash_ua = int(hashlib.md5(state.user_agent.encode('utf-8')).hexdigest(), 16) % 10000
         # features['ua_encoded'] = float(hash_ua)

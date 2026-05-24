@@ -25,11 +25,7 @@ class EvasionProxy:
         
         if self.p_state.seq_num == 0:
             self.p_state.seq_num = pk[TCP].seq
-
-        if self.p_state.flags == 0:
-            self.p_state.flags = str(pk[TCP].flags)
     
-
 
     def get_flow_id(self, pkt):
         if pkt[IP].dst == TARGET_IP:
@@ -76,8 +72,6 @@ class EvasionProxy:
                         self.p_state.win_size = self.mutation.new_value
                     case "seq_num":
                         self.p_state.seq_num = self.mutation.new_value
-                    case "flags":
-                        self.p_state.flags = self.mutation.new_value
                     case _: # 'default'
                         pass
             

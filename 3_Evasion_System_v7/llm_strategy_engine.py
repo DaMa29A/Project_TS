@@ -34,7 +34,7 @@ class LLMEvasionStrategyEngine:
         current_human_message = HumanMessage(content=(
             f"BASELINE TRAFFIC PROFILE:\n{baseline_info}\n\n"
             f"LAST DROP FEEDBACK:\n{feedback_info}\n\n"
-            "Based on the BASELINE TRAFFIC PROFILE and the LAST DROP FEEDBACK, decide which field to mutate among 'ttl', 'win_size', 'seq_num', or 'flags'. "
+            "Based on the BASELINE TRAFFIC PROFILE and the LAST DROP FEEDBACK, decide which field to mutate among 'ttl', 'win_size', 'seq_num'. "
             "Generate the JSON for the next mutation strategy."
         ))
 
@@ -47,13 +47,12 @@ class LLMEvasionStrategyEngine:
                 "- 'ttl' (Integer, IP Time-To-Live)\n"
                 "- 'win_size' (Integer, TCP Window Size)\n"
                 "- 'seq_num' (Integer, TCP Sequence Number)\n"
-                "- 'flags' (String, TCP Flags)\n\n"
                 "Constraints:\n"
                 "1. Output ONLY a valid JSON object. No markdown, no intro, no outro.\n"
                 "2. Use this exact schema:\n"
                 "{\n"
-                '  "field_to_mutate": "<must be exactly one of: ttl, win_size, seq_num, flags>",\n'
-                '  "new_value": <integer for ttl/win_size/seq_num, string for flags>,\n'
+                '  "field_to_mutate": "<must be exactly one of: ttl, win_size, seq_num>",\n'
+                '  "new_value": <integer for ttl/win_size/seq_num>,\n'
                 '  "reasoning": "<short chain-of-thought explanation of why you chose this>"\n'
                 "}\n"
             )),
