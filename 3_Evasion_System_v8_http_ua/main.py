@@ -18,22 +18,29 @@ def orchestrator_loop(proxy):
     # Simuliamo due strategie generate dall'LLM per questo test
     strategie_di_test = [
         MutationStrategy(field_to_mutate="user_agent", new_value="Morilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", reasoning="Test 1"),
-        MutationStrategy(field_to_mutate="win_size", new_value=90, reasoning="Test 2")
+        MutationStrategy(field_to_mutate="ttl", new_value=90, reasoning="Test 2"),
+        MutationStrategy(field_to_mutate="user_agent", new_value="Bender/1.0", reasoning="Test 1"),
+        MutationStrategy(field_to_mutate="win_size", new_value=666, reasoning="Test 2"),
     ]
+
     ua_state = None
 
     for i, strategia in enumerate(strategie_di_test):
         print(f"\n" + "="*40)
-        print(f"--- TEST {i + 1} ---")
-
-        if strategia.field_to_mutate == "user_agent":   
-            ua_state = strategia.new_value
+        print(f"--- TEST {i + 1} ---")  
+            
         
-        if ua_state:
-            print(f"[Orchestratore] Stato User-Agent attuale: {ua_state}")
+        if strategia.field_to_mutate == "user_agent":
+            print(f"[Orchestratore] Stato User-Agent attuale: {strategia.new_value}")
             with open("current_l7_mutation.json", "w") as f:
-                json.dump({"field_to_mutate": "user_agent", "new_value": ua_state}, f)
+                json.dump({"field_to_mutate": "user_agent", "new_value": strategia.new_value}, f)
+        else:
+            if ua_state:
+                print(f"[Orchestratore] Stato User-Agent attuale: {ua_state}")
+                with open("current_l7_mutation.json", "w") as f:
+                    json.dump({"field_to_mutate": "user_agent", "new_value": ua_state}, f)
                 
+
         # Modifica strategia
         proxy.mutation = strategia
         print(f"[Orchestratore] Impostata strategia: Muta {strategia.field_to_mutate} in {strategia.new_value}")
@@ -47,6 +54,7 @@ def orchestrator_loop(proxy):
             )
             # 3. VALUTIAMO IL REWARD
             if risultato.returncode == 0:
+                ua_state = strategia.new_value
                 print("[Orchestratore] [+] Risposta ricevuta dal Server! Evasione Riuscita! (Reward: +1)")
             else:
                 print("[Orchestratore] [-] Nessuna risposta o blocco (Timeout). (Reward: -1)")
