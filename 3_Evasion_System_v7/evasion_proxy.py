@@ -35,6 +35,8 @@ class EvasionProxy:
 
 
     def manage_packet(self, packet):
+        old_p_state = self.p_state
+
         # Estraiamo il payload grezzo e lo diamo in pasto a Scapy
         scapy_packet = IP(packet.get_payload())
 
@@ -102,5 +104,14 @@ class EvasionProxy:
         del scapy_packet[IP].chksum
         del scapy_packet[TCP].chksum
 
-        packet.set_payload(bytes(scapy_packet))
-        packet.accept()
+        try:
+            payload_bytes = bytes(scapy_packet)
+
+            packet.set_payload(payload_bytes)
+            packet.accept()
+            
+        except Exception as e:
+            print(f"[Proxy ERROR] Valore LLM illegale! Impossibile generare il pacchetto: {e}")
+            # Puniamo l'LLM: eliminiamo il pacchetto. Questo causerà un timeout e un Reward -1.
+            self.p_state = old_p_state
+            packet.drop()

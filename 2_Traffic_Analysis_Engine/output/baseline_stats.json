@@ -181,6 +181,59 @@
                 ],
                 "entropy": 3.317
             },
+            "seq_num": {
+                "stats": {
+                    "count": 1383,
+                    "min": 964760,
+                    "max": 4290006733,
+                    "mean": 2124286990.202,
+                    "median": 2042755906,
+                    "stdev": 1177178796.021
+                },
+                "top_values": [
+                    {
+                        "value": 1581157899,
+                        "count": 8
+                    },
+                    {
+                        "value": 2315906072,
+                        "count": 8
+                    },
+                    {
+                        "value": 964152554,
+                        "count": 8
+                    },
+                    {
+                        "value": 991620877,
+                        "count": 7
+                    },
+                    {
+                        "value": 2417315582,
+                        "count": 7
+                    },
+                    {
+                        "value": 2509941668,
+                        "count": 7
+                    },
+                    {
+                        "value": 3168413883,
+                        "count": 7
+                    },
+                    {
+                        "value": 2195108992,
+                        "count": 7
+                    },
+                    {
+                        "value": 3236714884,
+                        "count": 7
+                    },
+                    {
+                        "value": 726477312,
+                        "count": 6
+                    }
+                ],
+                "entropy": 9.7594
+            },
             "flags_combinations": {
                 "top_values": [
                     {

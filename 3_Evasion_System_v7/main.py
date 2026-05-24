@@ -10,9 +10,9 @@ from rl_classifier import RLMutationClassifier
 from feedback_analyzer import FeedbackAnalyzer
 from constants import TARGET_IP, OLLAMA_BASE_URL, OLLAMA_MODEL, BASELINE_JSON
 from models import MutationStrategy, PacketState, NetworkFeedback
-from utils import load_json
+from utils import load_json, calculate_js_distance
 
-MAX_ATTEMPTS = 2
+MAX_ATTEMPTS = 10
 
 def orchestrator_loop(proxy):
     print("[orchestrator_loop] Attendo 1.5 secondi per l'avvio della coda NFQueue...")
@@ -38,6 +38,13 @@ def orchestrator_loop(proxy):
         success_count = 0
         latencies = []
 
+        # Dizionario per memorizzare i valori storici mutati per ogni campo
+        applied_mutations = {
+            "ttl": [],
+            "win_size": [],
+            "seq_num": []
+        }
+
         i = 0 
         while i < MAX_ATTEMPTS:
             print(f"--- TEST {i + 1} ---")
@@ -46,6 +53,10 @@ def orchestrator_loop(proxy):
             start_time = time.time()
 
             strategy = engine.generate_strategy(baseline=baseline, last_feedback=last_feedback)
+
+            # Registra il valore mutato per le metriche JSD
+            if strategy.field_to_mutate in applied_mutations:
+                applied_mutations[strategy.field_to_mutate].append(strategy.new_value)
 
             # 2. Misurazione Latenza Fine
             end_time = time.time()
@@ -115,12 +126,31 @@ def orchestrator_loop(proxy):
         avg_latency = sum(latencies) / len(latencies) if latencies else 0
         evasion_rate = (success_count / MAX_ATTEMPTS) * 100
         
+        # Calcolo Mutation Stealth (JSD) per i campi principali
+        js_distances = {}
+        if baseline and "features" in baseline:
+            # Esempio per TTL
+            ttl_baseline = baseline["features"]["ttl"].get("top_values", [])
+            js_distances["ttl"] = calculate_js_distance(ttl_baseline, applied_mutations["ttl"])
+            
+            # Esempio per TCP Window Size
+            win_baseline = baseline["features"]["tcp"]["window_size"].get("top_values", [])
+            js_distances["win_size"] = calculate_js_distance(win_baseline, applied_mutations["win_size"])
+
+            # Esempio per Sequence Number
+            seq_baseline = baseline["features"]["tcp"]["seq_num"].get("top_values", [])
+            js_distances["seq_num"] = calculate_js_distance(seq_baseline, applied_mutations["seq_num"])
+
+
         print("=" * 50)
         print("📊 REPORT FINALE DELLA SESSIONE")
         print("=" * 50)
         print(f"Evasion Success Rate : {evasion_rate:.1f}% ({success_count} successi su {MAX_ATTEMPTS} tentativi)")
         print(f"Latenza Media LLM    : {avg_latency:.2f} secondi per iterazione")
         print(f"Stato RL Globale     : {proxy.classifier.get_memory_stats()}")
+        print("Mutation Stealth (JSD) [0.0 = Invisibile, 1.0 = Anomalo]:")
+        for field, dist in js_distances.items():
+            print(f"  - {field.upper()}: {dist:.4f}")
         print("=" * 50)
 
         # Fine del ciclo. Diciamo al main thread di spegnersi simulando un Ctrl+C

@@ -44,9 +44,9 @@ class LLMEvasionStrategyEngine:
                 "You are an expert Red Teamer.\n\n"
                 "Your objective is to generate dynamic protocol mutations to evade detection.\n"
                 "You can mutate ONLY ONE of the following fields at a time:\n"
-                "- 'ttl' (Integer, IP Time-To-Live)\n"
-                "- 'win_size' (Integer, TCP Window Size)\n"
-                "- 'seq_num' (Integer, TCP Sequence Number)\n"
+                "- 'ttl' (Integer, IP Time-To-Live. Valid range: 1 to 255)\n"
+                "- 'win_size' (Integer, TCP Window Size. Valid range: 0 to 65535)\n"
+                "- 'seq_num' (Integer, TCP Sequence Number. Valid range: 0 to 4294967295)\n"
                 "Constraints:\n"
                 "1. Output ONLY a valid JSON object. No markdown, no intro, no outro.\n"
                 "2. Use this exact schema:\n"
@@ -56,7 +56,7 @@ class LLMEvasionStrategyEngine:
                 '  "reasoning": "<short chain-of-thought explanation of why you chose this>"\n'
                 "}\n"
             )),
-            *self.history[-5:], # Teniamo gli ultimi 5 messaggi di storia
+            *self.history[-10:], # Teniamo gli ultimi 10 messaggi di storia
             current_human_message
         ]
 

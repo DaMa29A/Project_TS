@@ -15,6 +15,7 @@ def analyze_pcap(pcap_path):
     inter_arrival_times = []
     tcp_flags = []
     tcp_options = []
+    tcp_seq_numbers = []
     http_user_agents = []
     http_methods = []
 
@@ -42,6 +43,7 @@ def analyze_pcap(pcap_path):
             # 4. Livello TCP
             if TCP in pkt:                  
                 tcp_window_sizes.append(int(pkt[TCP].window)) 
+                tcp_seq_numbers.append(int(pkt[TCP].seq))
                 tcp_flags.append(str(pkt[TCP].flags))
                 
                 if hasattr(pkt[TCP], 'options') and pkt[TCP].options:
@@ -92,6 +94,11 @@ def analyze_pcap(pcap_path):
                     "stats": safe_numeric_stats(tcp_window_sizes),
                     "top_values": top_frequencies(tcp_window_sizes),
                     "entropy": calculate_entropy(tcp_window_sizes)
+                },
+                "seq_num": { 
+                    "stats": safe_numeric_stats(tcp_seq_numbers),
+                    "top_values": top_frequencies(tcp_seq_numbers),
+                    "entropy": calculate_entropy(tcp_seq_numbers)
                 },
                 "flags_combinations": {
                     "top_values": top_frequencies(tcp_flags)
