@@ -28,3 +28,8 @@ pip install NetfilterQueue
 
 sudo iptables -A OUTPUT -p tcp -d 192.168.20.10 --dport 80 -j NFQUEUE --queue-num 1
 sudo iptables -A INPUT -p tcp -s 192.168.20.10 --sport 80 -j NFQUEUE --queue-num 1
+
+
+############################# MITMPROXY #############################
+Su altro terminale:
+mitmdump -s mitm_addon.py
