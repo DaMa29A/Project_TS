@@ -1,20 +1,33 @@
 from scapy.all import IP, TCP
 from models import MutationStrategy
+from protocol_mutator import apply_mutation
 from constants import TARGET_IP
 
 class EvasionProxy:
-    def __init__(self, mutation : MutationStrategy = None):
+    def __init__(self, mutation: MutationStrategy = None):
         self.mutation = mutation
 
     def manage_packet(self, packet):
-        # Convertiamo il pacchetto in un formato che Scapy può leggere
+        # Estraiamo il payload grezzo e lo diamo in pasto a Scapy
         scapy_packet = IP(packet.get_payload())
         
-        # Controlliamo se è un pacchetto TCP e se è diretto al nostro target
+        # Controlliamo se è un pacchetto TCP diretto al target
         if scapy_packet.haslayer(TCP) and scapy_packet[IP].dst == TARGET_IP:
-            print(f"TCP Packet to {TARGET_IP} intercepted!")
+            # print(f"TCP Packet to {TARGET_IP} intercepted!")
+            
             if self.mutation:
-                print("Applying mutation strategy...")
+                print(f"[Proxy] Applico strategia: {self.mutation.field_to_mutate} -> {self.mutation.new_value}")
+                
+                # Creiamo la versione modificata del pacchetto
+                pk_mod = apply_mutation(scapy_packet, self.mutation)
 
-        # Accettiamo il pacchetto (lo lasciamo passare)
+                # RICALCOLO DEI CHECKSUM
+                # Eliminandoli, costringiamo Scapy a ricalcolarli matematicamente 
+                del pk_mod[IP].chksum
+                del pk_mod[TCP].chksum
+                
+                # SOVRASCRIVIAMO IL PACCHETTO NELLA CODA
+                packet.set_payload(bytes(pk_mod))
+
+        # Lasciamo passare il pacchetto (che ora contiene il payload modificato)
         packet.accept()

@@ -10,14 +10,15 @@ from models import MutationStrategy
 
 # sudo iptables -A OUTPUT -p tcp -d 192.168.20.10 --dport 80 -j NFQUEUE --queue-num 1
 
+MAX_ATTEMPTS = 1
+
 def orchestrator_loop(proxy):
     print("[Orchestratore] Attendo 1.5 secondi per l'avvio della coda NFQueue...")
     time.sleep(1.5) 
-    
+
     # Simuliamo due strategie generate dall'LLM per questo test
     strategie_di_test = [
-        MutationStrategy(field_to_mutate="ttl", new_value=128, reasoning="Test 1"),
-        MutationStrategy(field_to_mutate="win_size", new_value=500, reasoning="Test 2")
+        MutationStrategy(field_to_mutate="seq_num", new_value=4000, reasoning="Test 1"),
     ]
 
     for i, strategia in enumerate(strategie_di_test):
@@ -55,18 +56,16 @@ def orchestrator_loop(proxy):
 def main():
     proxy = EvasionProxy()
 
-    # Prepariamo la coda (1) Nfqueue
     nfqueue = NetfilterQueue()
-    nfqueue.bind(1, proxy.manage_packet) # Ogni pacchetto che arriva sulla coda 1 viene gestito da proxy.manage_packet
+    nfqueue.bind(1, proxy.manage_packet_seq)
 
-    # Passiamo l'oggetto proxy come argomento all'altro thread
+
     trigger_thread = threading.Thread(target=orchestrator_loop, args=(proxy,))
     trigger_thread.start()
     
-    # Avviamo l'ascolto sul thread principale
     try:
-        print("[*] Evasion Engine V6 in attesa sulla coda 1...")
-        nfqueue.run() # Questo blocca finché non arriva il segnale os.kill()
+        print("[*] Evasion Engine in attesa sulla coda 1...")
+        nfqueue.run()
     except KeyboardInterrupt:
         print("\n[*] Chiusura forzata dell'engine completata con successo.")
     finally:
