@@ -1,0 +1,6 @@
+==================================================
+REPORT FINALE DELLA SESSIONE
+==================================================
+Evasion Success Rate : 100.0% (50 successi su 50 tentativi)
+Latenza Media        : 91.03 secondi
+==================================================

@@ -1,0 +1,146 @@
+--- TEST 1 ---
+[Orchestratore] Stato Globale in test: {'ttl': 64}
+Generated Strategy: field_to_mutate='ttl' new_value=64 reasoning="Given the baseline traffic profile's 'ttl' statistics show a mean and median of 63 with minimal variability (stdev=0.488), changing TTL to its maximum value could potentially increase detection evasion, as it moves away from typical network layer behavior."
+Latenza LLM: 56.48 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 64
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 2 ---
+[Orchestratore] Stato Globale in test: {'ttl': 64, 'win_size': 160}
+Generated Strategy: field_to_mutate='win_size' new_value=160 reasoning="The baseline traffic profile's 'tcp' > 'window_size' statistics show a median of 160, which is the current maximum value in its top_values list. Changing it to this value could help evade detection by reducing variability and making it harder for Intrusion Detection Systems (IDS) to identify anomalies."
+Latenza LLM: 56.94 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 160
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 3 ---
+[Orchestratore] Stato Globale in test: {'ttl': 64, 'win_size': 160, 'seq_num': 2042755906}
+Generated Strategy: field_to_mutate='seq_num' new_value=2042755906 reasoning="The baseline traffic profile's 'tcp' > 'sequence_number' statistics show a median of 2042755906, which is the current maximum value in its top_values list. Given that no other packets have used such sequence numbers (the max observed so far was around 964760), changing it to this value could increase detection evasion by making our traffic look more anomalous and reducing chances of correlation with legitimate traffic."
+Latenza LLM: 94.11 secondi
+[Orchestratore] Impostata strategia: Muta seq_num in 2042755906
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 4 ---
+[Orchestratore] Stato Globale in test: {'ttl': 64, 'win_size': 160, 'seq_num': 2042755906, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36' reasoning="The baseline traffic profile's 'http' > 'user_agents' statistics show a distribution that is heavily skewed towards Mozilla-based browsers. Changing our user agent to one of the most common ones could help evade detection by reducing suspicion when our traffic is inspected for anomalies."
+Latenza LLM: 100.97 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 5 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 160, 'seq_num': 2042755906, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='ttl' new_value=65 reasoning="The baseline traffic profile's 'packet_size' and 'inter_arrival_time' statistics suggest a relatively stable network environment, while the 'tcp' > 'window_size' top_values show several packets with large window sizes. As our previous user_agent mutation was successful, we now want to focus on potentially disrupting the network layer. Therefore, changing TTL to 65 (slightly higher than the median) might help evade detection by causing minor packet retransmissions and delays."
+Latenza LLM: 103.05 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 65
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 6 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 30000, 'seq_num': 2042755906, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='win_size' new_value=30000 reasoning="As our previous TTL modification was successful, we want to continue exploring network-layer evasions. The baseline traffic profile's 'tcp' > 'window_size' stats show a median of 160 and a high standard deviation (24805.441). This indicates that the window sizes are not uniformly distributed. Changing the win_size to 30000 could disrupt this pattern, potentially allowing us to evade detection by exploiting any vulnerabilities in the network-layer analysis."
+Latenza LLM: 103.09 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 30000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 7 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 30000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='seq_num' new_value=100000000 reasoning="Having successfully evaded detection with our previous TTL and win_size modifications, we want to shift focus towards exploiting vulnerabilities in sequence number analysis. The baseline traffic profile's 'tcp' > 'sequence_number' stats show a high standard deviation (1177178796.021), suggesting that the sequence numbers are not uniformly distributed. Introducing a large new value for the sequence number could disrupt this pattern, potentially allowing us to evade detection by exploiting any vulnerabilities in sequence number analysis."
+Latenza LLM: 103.85 secondi
+[Orchestratore] Impostata strategia: Muta seq_num in 100000000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 8 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 30000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Opera/103.0.0.0 Version/12.16'}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Opera/103.0.0.0 Version/12.16' reasoning="Having successfully evaded detection with our previous TTL and sequence number modifications, we want to shift focus towards exploiting vulnerabilities in application-layer analysis. The baseline traffic profile's 'http' > 'user_agents' stats show a relatively high entropy (1.9473), suggesting that the user agents are not uniformly distributed. Introducing a common but altered Chrome browser user agent could disrupt this pattern and potentially allow us to evade detection by exploiting any vulnerabilities in application-layer analysis."
+Latenza LLM: 122.86 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Opera/103.0.0.0 Version/12.16
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 9 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 30000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Opera/103.0.0.0 Version/12.16'}
+Generated Strategy: field_to_mutate='ttl' new_value=65 reasoning="Having successfully evaded detection with our previous user agent modification, we want to shift focus towards exploiting vulnerabilities in network-layer analysis. The baseline traffic profile's 'tcp' > 'ttl' stats show a relatively low entropy (0.9646), suggesting that the TTL values are uniformly distributed. Introducing a slightly larger new value for the TTL could disrupt this pattern and potentially allow us to evade detection by exploiting any vulnerabilities in network-layer analysis."
+Latenza LLM: 103.94 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 65
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 10 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Opera/103.0.0.0 Version/12.16'}
+Generated Strategy: field_to_mutate='win_size' new_value=15000 reasoning="Having successfully evaded detection with our previous TTL modification, we want to shift focus towards exploiting vulnerabilities in TCP window-size analysis. The baseline traffic profile's 'tcp' > 'window_size' stats show a relatively high entropy (3.317), suggesting that the window sizes are not uniformly distributed. Introducing a significantly larger new value for the window size could disrupt this pattern and potentially allow us to evade detection by exploiting any vulnerabilities in TCP-layer analysis."
+Latenza LLM: 104.44 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 15000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 11 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Opera/103.0.0.0 Version/12.16', 'sequence_number': 4294967295}
+Generated Strategy: field_to_mutate='sequence_number' new_value=4294967295 reasoning="Given our previous successful modifications of TTL and WinSize, we will now attempt to disrupt analysis on Sequence Numbers (SeqNum). The baseline traffic profile's 'tcp' > 'seq_num' stats show an extremely high entropy value of 9.7594, indicating a high level of randomness in SeqNum values. We want to introduce the maximum possible seq number for this protocol to force a potential overflow or incorrect analysis by any network-layer-based systems."
+Latenza LLM: 109.09 secondi
+[Orchestratore] Impostata strategia: Muta sequence_number in 4294967295
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 12 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 OPR/54.0.3054.84', 'sequence_number': 4294967295}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 OPR/54.0.3054.84' reasoning="Given that our previous modifications of TTL and Sequence Numbers resulted in successful evasion, we will now attempt to disrupt analysis on User-Agent strings. The baseline traffic profile's 'http' > 'user_agents' stats show an entropy value of 1.9473, indicating a relatively low level of randomness and uniform distribution of user agents. Introducing a specific User-Agent string that may be less suspicious or associated with lower-risk sources could help evade detection."
+Latenza LLM: 123.06 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 OPR/54.0.3054.84
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 13 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 OPR/54.0.3054.84', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='window_size' new_value=1024 reasoning="Given our previous successful modifications of Sequence Numbers and User-Agent strings, we will now attempt to disrupt analysis on TCP Window Sizes. The baseline traffic profile's 'tcp' > 'window_size' stats show an entropy value of 3.317, indicating a moderate level of randomness in window size values. Introducing a relatively low window size (1024) could help evade detection by making the packet more vulnerable to loss or corruption."
+Latenza LLM: 104.29 secondi
+[Orchestratore] Impostata strategia: Muta window_size in 1024
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 14 ---
+[Orchestratore] Stato Globale in test: {'ttl': 255, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 OPR/54.0.3054.84', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='ttl' new_value=255 reasoning="Given our previous successful modifications of User-Agent strings and TCP Window Sizes, we will now attempt to disrupt analysis on IP Time-To-Live (TTL) values. The baseline traffic profile's 'ttl' stats show a very low entropy value of 0.9646, indicating that TTL is likely being used as an invariant or constant in the traffic generation process. Introducing a maximum possible TTL value (255) could help evade detection by making it more difficult to predict packet transmission times."
+Latenza LLM: 108.59 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 255
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 15 ---
+[Orchestratore] Stato Globale in test: {'ttl': 255, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36 OPR/54.0.3054.84', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='sequence_number' new_value=4294967295 reasoning="Given our previous successful modifications of TTL and TCP Window Sizes, we will now attempt to disrupt analysis on Sequence Numbers (Seq_Num). The baseline traffic profile's 'tcp' > 'seq_num' stats show an entropy value of 9.7594, indicating a significant level of randomness in SeqNum values. Introducing the maximum possible value for SeqNum could help evade detection by making it more difficult to predict packet ordering and transmission times."
+Latenza LLM: 104.20 secondi
+[Orchestratore] Impostata strategia: Muta sequence_number in 4294967295
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 16 ---
+[Orchestratore] Stato Globale in test: {'ttl': 255, 'win_size': 15000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36' reasoning="Given our previous successful modifications of TTL and Sequence Numbers, we will now attempt to disrupt analysis on User-Agent strings. The baseline traffic profile's 'http' > 'user_agents' stats show an entropy value of 1.9473, indicating a moderate level of randomness in User-Agent values. Introducing a common but distinctive User-Agent string could help evade detection by making it more difficult to predict the type of client generating the traffic."
+Latenza LLM: 121.05 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 17 ---
+[Orchestratore] Stato Globale in test: {'ttl': 255, 'win_size': 65535, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='win_size' new_value=65535 reasoning="Given our previous successful modifications of TTL and User-Agent strings, we will now attempt to disrupt analysis on TCP Window Sizes. The baseline traffic profile's 'tcp' > 'window_size' stats show an entropy value of 3.317, indicating a relatively high level of randomness in WinSize values. Introducing the maximum possible value for WinSize could help evade detection by making it more difficult to predict packet transmission times and rates."
+Latenza LLM: 104.46 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 65535
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 18 ---
+[Orchestratore] Stato Globale in test: {'ttl': 128, 'win_size': 65535, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='ttl' new_value=128 reasoning="Given our previous successful modifications of Window Size, we will now attempt to disrupt analysis on Time-To-Live (TTL) values. The baseline traffic profile's 'ttl' stats show a relatively low entropy value of 0.9646, indicating a high level of predictability in TTL values. Introducing an intermediate TTL value could help evade detection by making it more difficult to determine the origin and scope of the network traffic."
+Latenza LLM: 103.59 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 128
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 19 ---
+[Orchestratore] Stato Globale in test: {'ttl': 128, 'win_size': 65535, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.2 Safari/537.37', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.2 Safari/537.37' reasoning="Given our previous successful modifications of TTL and Window Size values, we will now attempt to disrupt analysis on User-Agent strings. The baseline traffic profile's 'http' > 'user_agents' stats show an entropy value of 1.9473, indicating a relatively low level of randomness in User-Agent values. Introducing a modified Chrome user-agent string could help evade detection by making it more difficult to identify the browser and version being used."
+Latenza LLM: 123.11 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.2 Safari/537.37
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 20 ---
+[Orchestratore] Stato Globale in test: {'ttl': 128, 'win_size': 1000, 'seq_num': 100000000, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.2 Safari/537.37', 'sequence_number': 4294967295, 'window_size': 1024}
+Generated Strategy: field_to_mutate='win_size' new_value=1000 reasoning="Given our previous successful modifications of User-Agent strings and TTL values, we will now attempt to disrupt analysis on Window Size values. The baseline traffic profile's 'tcp' > 'window_size' stats show an entropy value of 3.317, indicating a relatively low level of randomness in Window Size values. Introducing a lower Window Size value could help evade detection by making it more difficult to determine the network conditions and capabilities."
+Latenza LLM: 105.33 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 1000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+==================================================
+REPORT FINALE DELLA SESSIONE
+==================================================
+Evasion Success Rate : 100.0% (20 successi su 20 tentativi)
+Latenza Media        : 102.82 secondi
+==================================================

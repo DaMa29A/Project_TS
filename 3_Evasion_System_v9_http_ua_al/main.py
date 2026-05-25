@@ -9,8 +9,6 @@ from evasion_proxy import EvasionProxy
 from constants import TARGET_IP
 from models import MutationStrategy, PacketState
 
-# sudo iptables -A OUTPUT -p tcp -d 192.168.20.10 --dport 80 -j NFQUEUE --queue-num 1
-
 def orchestrator_loop(proxy):
     print("[Orchestratore] Attendo 1.5 secondi per l'avvio della coda NFQueue...")
     time.sleep(1.5) 
@@ -20,6 +18,7 @@ def orchestrator_loop(proxy):
         MutationStrategy(field_to_mutate="user_agent", new_value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36", reasoning="Test 1"),
         MutationStrategy(field_to_mutate="ttl", new_value=90, reasoning="Test 2"),
         MutationStrategy(field_to_mutate="accept_language", new_value="it-IT,it;q=0.9", reasoning="Test 3"),
+        MutationStrategy(field_to_mutate="user_agent", new_value="PoE2-Discord-Bot/1.0.0", reasoning="Test 1"),
         MutationStrategy(field_to_mutate="win_size", new_value=666, reasoning="Test 4"),
     ]
 

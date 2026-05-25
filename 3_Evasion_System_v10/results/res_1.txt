@@ -1,0 +1,76 @@
+--- TEST 1 ---
+[Orchestratore] Stato Globale in test: {'ttl': 62}
+Generated Strategy: field_to_mutate='ttl' new_value=62 reasoning='The baseline traffic profile shows that all TTLs are consistently either 63 or 64, indicating a tight control over IP Time-To-Live values in the network.'
+Latenza LLM: 52.68 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 62
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 2 ---
+[Orchestratore] Stato Globale in test: {'ttl': 62, 'win_size': 20000}
+Generated Strategy: field_to_mutate='win_size' new_value=20000 reasoning="Given that the last mutation to TTL was successful, we'll now target a different layer: Application Layer. We've identified TCP Window Size as another potential evasion vector."
+Latenza LLM: 47.26 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 20000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 3 ---
+[Orchestratore] Stato Globale in test: {'ttl': 62, 'win_size': 20000, 'seq_num': 1581157899}
+Generated Strategy: field_to_mutate='seq_num' new_value=1581157899 reasoning="The last two mutations were successful, so we'll maintain our momentum by targeting a different field: Sequence Number. We've chosen to reset it to one of the top values identified in the baseline traffic profile."
+Latenza LLM: 76.78 secondi
+[Orchestratore] Impostata strategia: Muta seq_num in 1581157899
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 4 ---
+[Orchestratore] Stato Globale in test: {'ttl': 62, 'win_size': 20000, 'seq_num': 1581157899, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36' reasoning="We've successfully evaded detection using high TTL values and Sequence Numbers, so now it's time to target the Application Layer by changing the User-Agent header. This is a commonly used evasion technique."
+Latenza LLM: 91.63 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 5 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 20000, 'seq_num': 1581157899, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='ttl' new_value=65 reasoning="We've successfully evaded detection using high TTL values, so now it's time to slightly modify the TTL value to maintain our momentum while also targeting a different field: Time-To-Live."
+Latenza LLM: 81.93 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 65
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 6 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 1000, 'seq_num': 1581157899, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='win_size' new_value=1000 reasoning="We've successfully evaded detection by slightly modifying TTL, so now let's target a different field: TCP Window Size. We'll set it to a moderate value of 1000."
+Latenza LLM: 81.13 secondi
+[Orchestratore] Impostata strategia: Muta win_size in 1000
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 7 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 1000, 'seq_num': 1581157899, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='seq_num' new_value=1581157899 reasoning="We've successfully evaded detection by slightly modifying TCP Window Size, so now let's target a different field: Sequence Number. We'll use the same value that has been seen in the baseline traffic."
+Latenza LLM: 79.06 secondi
+[Orchestratore] Impostata strategia: Muta seq_num in 1581157899
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 8 ---
+[Orchestratore] Stato Globale in test: {'ttl': 65, 'win_size': 1000, 'seq_num': 1581157899, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='user_agent' new_value='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36' reasoning="We've successfully evaded detection by modifying Sequence Number with a value from the top values, so now let's target a different field: User-Agent. We'll use one of the most common user-agents seen in the baseline traffic."
+Latenza LLM: 97.39 secondi
+[Orchestratore] Impostata strategia: Muta user_agent in Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 9 ---
+[Orchestratore] Stato Globale in test: {'ttl': 63, 'win_size': 1000, 'seq_num': 1581157899, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='ttl' new_value=63 reasoning="We've successfully evaded detection by modifying User-Agent with a commonly seen value, so now let's target a different field: Time-To-Live (TTL). We'll use the most common TTL value from the baseline traffic profile."
+Latenza LLM: 89.16 secondi
+[Orchestratore] Impostata strategia: Muta ttl in 63
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+--- TEST 10 ---
+[Orchestratore] Stato Globale in test: {'ttl': 63, 'win_size': 1000, 'seq_num': 964152554, 'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+Generated Strategy: field_to_mutate='seq_num' new_value=964152554 reasoning="We've successfully evaded detection by modifying TTL with a commonly seen value, so now let's target a different field: Sequence Number (SEQ_NUM). We'll use one of the top values from the baseline traffic profile for SEQ_NUM."
+Latenza LLM: 90.95 secondi
+[Orchestratore] Impostata strategia: Muta seq_num in 964152554
+[+] SYN-ACK reale sniffato! Evasione riuscita. Reward: +1
+
+==================================================
+REPORT FINALE DELLA SESSIONE
+==================================================
+Evasion Success Rate : 100.0% (10 successi su 10 tentativi)
+Latenza Media        : 78.80 secondi
+==================================================
