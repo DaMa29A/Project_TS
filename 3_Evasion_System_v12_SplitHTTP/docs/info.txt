@@ -1,0 +1,20 @@
+{
+  "field_to_mutate": "ttl", "win_size", "seq_num"
+  "new_value": 64,
+  "reasoning": "..."
+}
+
+{
+  "field_to_mutate": "user_agent", "accept_language"
+  "new_value": "...",
+  "reasoning": "..."
+}
+
+{
+  "field_to_mutate": "http_split",
+  "new_value": {
+    "chunk_size": 8,
+    "delay_ms": 50
+  },
+  "reasoning": "..."
+}
