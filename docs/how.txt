@@ -33,3 +33,5 @@ sudo iptables -A INPUT -p tcp -s 192.168.20.10 --sport 80 -j NFQUEUE --queue-num
 ############################# MITMPROXY #############################
 Su altro terminale:
 mitmdump -s mitm_addon.py
+
+############################# TCPDUMP SU MINT #############################

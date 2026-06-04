@@ -1,0 +1,153 @@
+{
+    "input_file": "capture.pcap",
+    "total_packets": 1383,
+    "features": {
+        "packet_size": {
+            "stats": {
+                "min": 66,
+                "max": 7306,
+                "mean": 269.329,
+                "stdev": 793.562
+            },
+            "top_values": [
+                66,
+                74,
+                656,
+                825,
+                626,
+                510,
+                413,
+                452,
+                567,
+                896
+            ]
+        },
+        "inter_arrival_time": {
+            "stats": {
+                "min": 0.0,
+                "max": 7.352177,
+                "mean": 0.149,
+                "stdev": 0.722
+            },
+            "top_values": [
+                0.0,
+                0.001,
+                0.002,
+                0.003,
+                0.008,
+                0.007,
+                0.006,
+                0.032,
+                0.024,
+                0.019
+            ]
+        },
+        "ttl": {
+            "stats": {
+                "min": 63,
+                "max": 64,
+                "mean": 63.39,
+                "stdev": 0.488
+            },
+            "top_values": [
+                63,
+                64
+            ],
+            "entropy": 0.9646
+        },
+        "ip_id": {
+            "stats": {
+                "min": 0,
+                "max": 65267,
+                "mean": 30547.103,
+                "stdev": 20447.109
+            },
+            "top_values": [
+                0,
+                16929,
+                8576,
+                49721,
+                49722,
+                47835,
+                47836,
+                11641,
+                11642,
+                11643
+            ],
+            "entropy": 9.7953
+        },
+        "tcp": {
+            "window_size": {
+                "stats": {
+                    "min": 124,
+                    "max": 65160,
+                    "mean": 11914.843,
+                    "stdev": 24805.441
+                },
+                "top_values": [
+                    126,
+                    507,
+                    125,
+                    64240,
+                    65160,
+                    508,
+                    506,
+                    504,
+                    501,
+                    124
+                ],
+                "entropy": 3.317
+            },
+            "seq_num": {
+                "stats": {
+                    "min": 964760,
+                    "max": 4290006733,
+                    "mean": 2124286990.202,
+                    "stdev": 1177178796.021
+                },
+                "entropy": 9.7594
+            },
+            "flags_combinations": {
+                "top_values": [
+                    "A",
+                    "PA",
+                    "FA",
+                    "S",
+                    "SA"
+                ]
+            },
+            "options_combinations": {
+                "top_values": [
+                    "['NOP', 'NOP', 'Timestamp']",
+                    "['MSS', 'SAckOK', 'Timestamp', 'NOP', 'WScale']"
+                ]
+            }
+        },
+        "http": {
+            "methods": {
+                "top_values": [
+                    "GET",
+                    "HEAD"
+                ]
+            },
+            "user_agents": {
+                "top_values": [
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
+                ],
+                "entropy": 1.9473
+            },
+            "accept_languages": {
+                "top_values": [
+                    "en-US,en;q=0.9",
+                    "it-IT,it;q=0.8",
+                    "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7"
+                ],
+                "entropy": 1.2212
+            }
+        }
+    }
+}
