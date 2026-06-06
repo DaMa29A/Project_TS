@@ -1,2 +1,0 @@
-In zeek_ananlysis folder open shell and digit:
-zeek -C -r ../input/capture.pcap

@@ -1,27 +1,6 @@
 {
     "input_file": "capture.pcap",
     "total_packets": 1856,
-    "flow_profiling": {
-        "total_flows": 134,
-        "flow_duration": {
-            "min": 0.0027551651000976562,
-            "max": 0.2663400173187256,
-            "mean": 0.07,
-            "stdev": 0.063
-        },
-        "packets_per_flow": {
-            "min": 4,
-            "max": 18,
-            "mean": 8.336,
-            "stdev": 3.097
-        },
-        "bytes_per_flow": {
-            "min": 216,
-            "max": 5196,
-            "mean": 1542.201,
-            "stdev": 1151.033
-        }
-    },
     "features": {
         "packet_size": {
             "stats": {
@@ -63,40 +42,38 @@
                 0.009
             ]
         },
-        "ip": {
-            "ttl": {
-                "stats": {
-                    "min": 63,
-                    "max": 63,
-                    "mean": 63,
-                    "stdev": 0.0
-                },
-                "top_values": [
-                    63
-                ],
-                "entropy": 0.0
+        "ttl": {
+            "stats": {
+                "min": 63,
+                "max": 63,
+                "mean": 63,
+                "stdev": 0.0
             },
-            "ip_id": {
-                "stats": {
-                    "min": 0,
-                    "max": 65031,
-                    "mean": 29912.176,
-                    "stdev": 18849.88
-                },
-                "top_values": [
-                    20183,
-                    20184,
-                    20185,
-                    20186,
-                    20187,
-                    20188,
-                    18481,
-                    18482,
-                    18483,
-                    18484
-                ],
-                "entropy": 10.1147
-            }
+            "top_values": [
+                63
+            ],
+            "entropy": 0.0
+        },
+        "ip_id": {
+            "stats": {
+                "min": 0,
+                "max": 65031,
+                "mean": 29912.176,
+                "stdev": 18849.88
+            },
+            "top_values": [
+                20183,
+                20184,
+                20185,
+                20186,
+                20187,
+                20188,
+                18481,
+                18482,
+                18483,
+                18484
+            ],
+            "entropy": 10.1147
         },
         "tcp": {
             "window_size": {
@@ -148,12 +125,6 @@
             }
         },
         "http": {
-            "methods": {
-                "top_values": [
-                    "GET",
-                    "HEAD"
-                ]
-            },
             "user_agents": {
                 "top_values": [
                     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/148.0.0.0 Safari/537.36",

@@ -1,0 +1,4 @@
+index,reward,mutated_field,mutated_value,ttl,win_size,sequence_number,user_agent,accept_language,reasoning
+16,1,ttl,222
+15,1,user_agent,Go-http-client,,,,,,,Default Go HTTP library; usually not blocked due to high false positive risk
+1,1,http_split,"{""chunks"": 5}"

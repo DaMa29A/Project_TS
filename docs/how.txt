@@ -26,8 +26,13 @@ curl http://192.168.174.1:11434/api/tags
 sudo apt install build-essential python3-dev libnetfilter-queue-dev
 pip install NetfilterQueue
 
+# To add
 sudo iptables -A OUTPUT -p tcp -d 192.168.20.10 --dport 80 -j NFQUEUE --queue-num 1
 sudo iptables -A INPUT -p tcp -s 192.168.20.10 --sport 80 -j NFQUEUE --queue-num 1
+
+# To remove
+sudo iptables -D OUTPUT -p tcp -d 192.168.20.10 --dport 80 -j NFQUEUE --queue-num 1
+sudo iptables -D INPUT -p tcp -s 192.168.20.10 --sport 80 -j NFQUEUE --queue-num 1
 
 
 ############################# MITMPROXY #############################
@@ -35,3 +40,5 @@ Su altro terminale:
 mitmdump -s mitm_addon.py
 
 ############################# TCPDUMP SU MINT #############################
+sudo tcpdump -nn -i ens33 host 192.168.10.10 -v
+sudo tshark -i any -Y "http.request.method == POST" -V

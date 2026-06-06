@@ -1,0 +1,3 @@
+In zeek_ananlysis folder open shell and digit:
+zeek -C -r ../input/capture.pcap
+zeek -C -r ../input/capture.pcap LogAscii::use_json=T

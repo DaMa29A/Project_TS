@@ -4,6 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 INPUT_DIR = BASE_DIR / "input"
+ZEEK_DIR = BASE_DIR / "zeek_analysis"
 OUTPUT_DIR = BASE_DIR / "output"
 
 INPUT_PCAP = INPUT_DIR / "capture.pcap"

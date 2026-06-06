@@ -16,6 +16,4 @@ Quando catturi con pfsense metti:
   - [Any of] 80 443 sopra PORT NUMBER 
 
 Cattura tcdump su mint:
-sudo tcpdump -ni ens33 -U -w - '(host 192.168.20.10 and (port 80 or port 443))' | tee capture.pcap | tcpdump -nr -
-oppure solo http:
-sudo tcpdump -ni ens33 -U -w - 'host 192.168.20.10 and port 80' | tee capture.pcap | tcpdump -nr -
+sudo tcpdump -ni ens33 -U -w - '(host 192.168.10.10 and (port 80 or port 443))' | tee capture.pcap | tcpdump -nr -

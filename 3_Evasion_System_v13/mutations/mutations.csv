@@ -1,0 +1,13 @@
+reward,mutated_field,mutated_value,ttl,win_size,seq_num,user_agent,accept_language,http_split,reasoning
+1,ttl,222,222,64240,3731851443,curl/8.19.0,,,
+1,user_agent,Go-http-client,222,64240,3731851443,Go-http-client,,,
+-1,http_split,"{""chunks"": 5}",222,64240,3731851443,Go-http-client,,,
+1,ttl,222,222,64240,3334691429,curl/8.19.0,,,
+1,user_agent,Go-http-client,222,64240,3334691429,Go-http-client,,,
+1,http_split,"{""chunks"": 5}",222,64240,3334691429,Go-http-client,,"{""chunks"": 5}",
+1,ttl,222,222,64240,2013375287,curl/8.19.0,,,
+1,user_agent,Go-http-client,222,64240,2013375287,Go-http-client,,,
+1,http_split,"{""chunks"": 5}",222,64240,2013375287,Go-http-client,,"{""chunks"": 5}",
+1,ttl,222,222,64240,360197386,curl/8.19.0,,,
+1,user_agent,Go-http-client,222,64240,360197386,Go-http-client,,,
+1,http_split,"{""chunks"": 5}",222,64240,360197386,Go-http-client,,"{""chunks"": 5}",

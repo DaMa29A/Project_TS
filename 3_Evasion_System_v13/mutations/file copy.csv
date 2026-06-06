@@ -1,0 +1,9 @@
+index,reward,mutated_field,mutated_value,ttl,win_size,sequence_number,user_agent,accept_language,reasoning
+8,1,win_size,600,,,,,,,Directory brute forcing tool; commonly triggers web scanning detection
+13,1,user_agent,curl/7.81.0,,,,,,,
+14,1,user_agent,curl/,,,,,,,
+16,1,user_agent,curl,,,,,,,
+15,1,user_agent,Go-http-client,,,,,,,Default Go HTTP library; usually not blocked due to high false positive risk
+16,1,ttl,222
+17,1,user_agent,Miao
+1,1,http_split,"{""chunks"": 5}"
