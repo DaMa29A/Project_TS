@@ -5,7 +5,7 @@
 }
 
 {
-  "field_to_mutate": "user_agent", "accept_language"
+  "field_to_mutate": "user_agent", "accept_language", ...
   "new_value": "...",
   "reasoning": "..."
 }
@@ -17,3 +17,35 @@
   },
   "reasoning": "..."
 }
+
+{
+  "field_to_mutate": "flags",
+  "new_value": {
+    "action": "set"	    Sostituisce completamente i flag originali con value.	"set": 0x18 (ACK+PSH)
+              "add"	    Aggiunge (OR logico) i flag specificati a quelli originali.	"add": 0x08 (aggiunge PSH)
+              "remove"	Rimuove (AND con NOT) i flag specificati.	"remove": 0x20 (rimuove URG)
+              "toggle"	Inverte (XOR) i flag specificati.	"toggle": 0x01 (inverte FIN),
+    "value": "S" | "SA" | "A" | "U" | "PA" | "FA" | "R" | "RA" "PUA" | "EA" | "CA", (o forse meglio darmi in valore intero decimale da convertire poi in esadecimale)
+    "apply_to": "all_packets"	      Tutti i pacchetti TCP della connessione.
+                "data_packets_only"	Solo pacchetti con payload (esclude SYN, FIN, RST, puri ACK).
+                "established_only"	Solo dopo che la connessione è stabilita (dopo handshake).
+                "syn_only"          Solo il pacchetto SYN iniziale (utile per test).
+                "fin_only"
+                "ack_only"
+  },
+  "reasoning": "..."
+}
+
+
+Problema jitter:
+Problema della ritrasmissione con jitter
+Quando introduci time.sleep() nel proxy (NFQUEUE), il kernel TCP del mittente (Kali) 
+non sa che il pacchetto è stato ritardato. Se il ritardo supera il RTO (Retransmission Timeout, 
+di solito 200 ms), il kernel pensa che il pacchetto sia perso e lo ritrasmette, causando duplicati e confusione.
+Soluzione pratica nel tuo codice: Limita il ritardo massimo a 100 ms (invece di 500 ms)
+
+Retransmission simulation (richiesta dalla traccia)
+Il documento dice (pagina 8): "Simulate packet loss with randomized retries".
+La simulazione di perdita di pacchetti con ritrasmissioni casuali può essere realizzata 
+droppando selettivamente alcuni pacchetti e lasciando che il TCP nativo del mittente le ritrasmetta automaticamente. 
+Questo soddisfa la richiesta senza dover implementare un meccanismo di reiniezione complesso.

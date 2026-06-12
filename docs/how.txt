@@ -42,3 +42,6 @@ mitmdump -s mitm_addon.py
 ############################# TCPDUMP SU MINT #############################
 sudo tcpdump -nn -i ens33 host 192.168.10.10 -v
 sudo tshark -i any -Y "http.request.method == POST" -V
+
+per vedere chunks:
+sudo tcpdump -i any -s 0 -A tcp port 80

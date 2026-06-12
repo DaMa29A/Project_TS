@@ -17,6 +17,9 @@ class PacketState(BaseModel):
     ttl: int = 0
     win_size: int = 0
     seq_num: int = 0
-    flags: str = ""
+    ip_id : int = 0
+    flags: Any = None
     user_agent: str = ""
     accept_language: str = ""
+    referer: str = ""
+    content_type: str = ""

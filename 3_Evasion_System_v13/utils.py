@@ -103,7 +103,23 @@ def append_mutation_to_csv(filepath: str | Path, strategy: MutationStrategy, rew
     
     # Apri in modalità 'a' (append) per accodare i dati
     with open(file_path, mode='a', newline='', encoding='utf-8') as file:
-        fieldnames = ["reward", "mutated_field", "mutated_value", "ttl", "win_size", "seq_num", "user_agent", "accept_language", "http_split", "reasoning"]
+        fieldnames = ["reward", 
+                      "mutated_field", 
+                      "mutated_value", 
+                      "ttl", 
+                      "ip_id", 
+                      "win_size", 
+                      "seq_num", 
+                      "flags",
+                      "user_agent", 
+                      "accept_language",
+                      "referer",
+                      "content_type",
+                      "cookies", 
+                      "http_split", 
+                      "jitter",
+                      "retransmit",
+                      "reasoning"]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         
         # Scrivi gli header solo se il file è appena stato creato
@@ -119,9 +135,15 @@ def append_mutation_to_csv(filepath: str | Path, strategy: MutationStrategy, rew
             "ttl": active_mutations.get("ttl", ""),
             "win_size": active_mutations.get("win_size", ""), 
             "seq_num": active_mutations.get("seq_num", ""),
+            "ip_id": active_mutations.get("ip_id", ""),
+            "flags": active_mutations.get("flags", ""),
             "user_agent": active_mutations.get("user_agent", ""), 
             "accept_language": active_mutations.get("accept_language", ""), 
-            "http_split": active_mutations.get("http_split", "")
+            "referer": active_mutations.get("referer", ""),
+            "content_type": active_mutations.get("content_type", ""),
+            "http_split": active_mutations.get("http_split", ""),
+            "jitter": active_mutations.get("jitter", ""),
+            "retransmit": active_mutations.get("retransmitt", ""),
         })
 
 

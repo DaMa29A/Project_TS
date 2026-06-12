@@ -42,7 +42,7 @@ class EvasionAddon:
             # -------------------------------------------------
             # Chunked transfer encoding 
             # -------------------------------------------------
-            if "http_split_old" in mutations:
+            if "http_split" in mutations:
                 value = mutations["http_split"]
                 print(f"Value 1: {value}")
 
@@ -58,20 +58,45 @@ class EvasionAddon:
                 num_chunks = int(value.get("chunks", 5))
 
                 body = flow.request.raw_content
+                print(f"body raw: {body}")
+                body = flow.request.get_text()
+                print(f"body: {body}")
+                
                 if not body:
                     return
 
                 chunk_size = math.ceil(len(body) / num_chunks)
+                print(f"chunk size: {chunk_size}")
 
                 chunks = []
                 for i in range(0, len(body), chunk_size):
                     chunks.append(body[i:i + chunk_size])
+                print(f"chunks: {chunks}")
 
+                # Ricostruisci il corpo nel formato chunked:
+                # Ogni chunk deve essere: [lunghezza_esadecimale]\r\n[dati]\r\n
+                chunked_body = b""
+                for chunk in chunks:
+                    chunk_bytes = chunk.encode('utf-8')
+                    #chunked_body += f"{len(chunk_bytes):X}\r\n".encode('utf-8')
+                    #chunked_body += chunk_bytes + b"\r\n"
+                    chunked_body += f"{len(chunk_bytes):X}\r\n".encode('utf-8') + chunk_bytes + b"\r\n"
+                # Aggiungi il blocco di chiusura (0\r\n\r\n)
+                chunked_body += b"0\r\n\r\n"
+                print(f"Chuncked body: {chunked_body}")
+
+                # Ora assegna il corpo al flusso
+                print(f"Flow_request_content before: {flow.request.content}")
+                #flow.request.content = chunked_body
+                flow.request.raw_content = chunked_body
+                print(f"Flow_request_content after: {flow.request.content}")
+      
                 # abilita chunked transfer
                 flow.request.headers["Transfer-Encoding"] = "chunked"
                 if "Content-Length" in flow.request.headers:
                     del flow.request.headers["Content-Length"]
 
+                """
                 new_body = b""
                 for chunk in chunks:
                     #time.sleep(delay_ms / 1000)
@@ -82,12 +107,12 @@ class EvasionAddon:
                 new_body += b"0\r\n\r\n"
                 flow.request.raw_content = new_body
 
-                print(f"[Mitmproxy] HTTP split applicato | chunks={len(chunks)} | chunk_size={chunk_size}")
+                print(f"[Mitmproxy] HTTP split applicato | chunks={len(chunks)} | chunk_size={chunk_size}")"""
             
             # -------------------------------------------------
             #  HTTP SPLIT -> MULTIPLE REQUESTS
             # -------------------------------------------------
-            if "http_split" in mutations:
+            if "http_split_old" in mutations:
                 value = mutations["http_split"]
 
                 if isinstance(value, str):

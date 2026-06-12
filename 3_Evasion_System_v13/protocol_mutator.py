@@ -1,4 +1,5 @@
-from scapy.all import IP, TCP
+from scapy.all import IP, TCP, Raw
+from utils import tcp_flags_str_to_int
 
 def apply_outbound_mutations(scapy_packet, p_state, mutation, flow_state):
     """
@@ -15,6 +16,10 @@ def apply_outbound_mutations(scapy_packet, p_state, mutation, flow_state):
     # ------- Modifica Window Size ------- 
     if p_state.win_size != tcp.window:
         tcp.window = p_state.win_size
+    
+    # ------- Modifica IP ID Statico -------
+    if p_state.ip_id != scapy_packet[IP].id:
+        scapy_packet[IP].id = p_state.ip_id
 
     # ------- Modifica Sequence Number ------- 
     if (mutation.field_to_mutate == "seq_num"):
@@ -32,6 +37,13 @@ def apply_outbound_mutations(scapy_packet, p_state, mutation, flow_state):
         # Applichiamo la traslazione del Sequence Number a TUTTI i pacchetti in uscita
         if flow_state["locked"] and flow_state["seq_delta"] != 0:
             tcp.seq = (tcp.seq + flow_state["seq_delta"]) % MOD
+    
+    # ------- Modifica Flags ------- 
+    if (mutation.field_to_mutate == "flags"):
+        has_payload = len(scapy_packet[TCP].payload) > 0 if Raw in scapy_packet else False
+        new_flags = apply_tcp_flags_mutation(tcp, p_state.flags, flow_state, has_payload)
+        tcp.flags = new_flags
+        print(f"[Mutator] TCP flags: {p_state.flags['action']} -> {new_flags:02x}")
 
     return scapy_packet
 
@@ -58,3 +70,57 @@ def apply_inbound_translation(scapy_packet, flow_state):
         flow_state["established"] = True
 
     return scapy_packet
+
+
+def apply_tcp_flags_mutation(tcp, flags_dict, flow_state, packet_has_payload):
+    """
+    flags_dict: {'action': 'add'|'set'|'remove'|'toggle', 'value': intero o stringa, 'apply_to': ...}
+    flow_state: dict con 'established'
+    packet_has_payload: bool (len(tcp.payload)>0)
+    """
+    action = flags_dict.get('action', 'add')
+    raw_value = flags_dict.get('value', 0)
+    apply_to = flags_dict.get('apply_to', 'all_packets')
+    
+    # Determina se questo pacchetto deve essere mutato
+    should = False
+    if apply_to == 'all_packets':
+        should = True
+    elif apply_to == 'syn_only':
+        should = (tcp.flags & 0x02) != 0
+    elif apply_to == 'fin_only':
+        should = (tcp.flags & 0x01) != 0
+    elif apply_to == 'ack_only':
+        should = (tcp.flags & 0x10) != 0 and (tcp.flags & 0x1F) == 0x10
+    elif apply_to == 'data_packets_only':
+        should = packet_has_payload or (tcp.flags & 0x08)
+    elif apply_to == 'established_only':
+        should = flow_state.get('established', False)
+    else:
+        should = True
+    
+    if not should:
+        return tcp.flags
+    
+    # Converte il valore in intero bitmask
+    if isinstance(raw_value, str):
+        bitmask = tcp_flags_str_to_int(raw_value)
+    else:
+        bitmask = int(raw_value)
+    
+    old_flags = tcp.flags
+    
+    if action == 'set':
+        new_flags = bitmask
+    elif action == 'add':
+        new_flags = old_flags | bitmask
+    elif action == 'remove':
+        new_flags = old_flags & ~bitmask
+    elif action == 'toggle':
+        new_flags = old_flags ^ bitmask
+    else:
+        new_flags = old_flags
+    
+    # Sicurezza: preserva almeno SYN se è il primo pacchetto? Potresti aggiungere una protezione.
+    # Per ora restituisci il nuovo valore.
+    return new_flags

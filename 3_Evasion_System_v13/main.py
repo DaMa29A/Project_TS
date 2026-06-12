@@ -25,7 +25,6 @@ def orchestrator_loop(proxy):
     success_count = 0
     latencies = []
 
-    applied_mutations = {"ttl": [], "win_size": [], "seq_num": []}
     active_mutations = {}
 
     last_feedback = None
@@ -69,6 +68,8 @@ def orchestrator_loop(proxy):
             proxy.p_state.win_size = test_state["win_size"]
         if "seq_num" in test_state:
             proxy.p_state.seq_num = test_state["seq_num"]
+        if "ip_id" in test_state:
+            proxy.p_state.ip_id = test_state["ip_id"]
 
         proxy.mutation = strategy
 
@@ -90,11 +91,11 @@ def orchestrator_loop(proxy):
                     "curl",
                     "-x",
                     "http://127.0.0.1:8080",
-                    "-d", "id=1' OR 1=1--",     # body
+                    "-d", "username=admin&password=test123",     # body
                     "-s",
                     "--max-time",
                     "3",
-                    f"http://{TARGET_IP}/mfolder/"
+                    f"http://{TARGET_IP}/mfolder/" #upload.php
                 ],
                 timeout=3,
                 capture_output=True,
@@ -143,6 +144,9 @@ def orchestrator_loop(proxy):
             
         if "seq_num" not in active_mutations and proxy.p_state.seq_num != 0:
             active_mutations["seq_num"] = proxy.p_state.seq_num
+        
+        if "ip_id" not in active_mutations and proxy.p_state.ip_id != 0:
+            active_mutations["ip_id"] = proxy.p_state.ip_id
         
         if "user_agent" not in active_mutations and proxy.p_state.user_agent != "":
             active_mutations["user_agent"] = proxy.p_state.user_agent
