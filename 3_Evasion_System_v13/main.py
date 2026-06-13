@@ -54,7 +54,8 @@ def orchestrator_loop(proxy):
             l7_mutations["content_type"] = test_state["content_type"]
         if "http_split" in test_state:
             l7_mutations["http_split"] = test_state["http_split"]
-
+    
+    
         if l7_mutations:
             with open("current_l7_mutation.json", "w") as f:
                 json.dump(l7_mutations, f)
@@ -101,7 +102,7 @@ def orchestrator_loop(proxy):
                     "-s",
                     "--max-time",
                     "3",
-                    f"http://{TARGET_IP}/mfolder/" #upload.php
+                    f"http://{TARGET_IP}/mfolder/upload.php" #upload.php
                 ],
                 timeout=3,
                 capture_output=True,
@@ -182,6 +183,9 @@ def orchestrator_loop(proxy):
     print(f"Evasion Rate: {evasion_rate:.2f}%")
     print(f"Avg Latency: {avg_latency:.2f}s")
     print("=" * 50)
+
+    proxy.mutation = None
+    proxy.flow_state = {}
 
     os.kill(os.getpid(), signal.SIGINT)
 

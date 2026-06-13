@@ -147,7 +147,6 @@ def append_mutation_to_csv(filepath: str | Path, strategy: MutationStrategy, rew
         })
 
 
-
 def calculate_js_distance(baseline_top_values, mutated_values):
     """
     Calcola la Jensen-Shannon Distance per un campo specifico.
@@ -182,8 +181,6 @@ def calculate_js_distance(baseline_top_values, mutated_values):
     
     # 5. Calcola e restituisci la distanza (tra 0 e 1)
     return jensenshannon(p, q)
-
-
 
 
 def tcp_flags_str_to_int(flag_str: str) -> int:

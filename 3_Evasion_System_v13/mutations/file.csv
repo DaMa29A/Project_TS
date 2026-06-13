@@ -1,2 +1,2 @@
 index,reward,mutated_field,mutated_value,ttl,win_size,sequence_number,user_agent,accept_language,reasoning
-4,1,http_split,"{""num_chunks"": 3, ""uniform"": true}"
+4,1,ttl,"66"

@@ -72,89 +72,6 @@ class EvasionProxy:
             return (pkt[IP].dst, pkt[TCP].dport, pkt[IP].src, pkt[TCP].sport)
 
 
-    def build_chunked_frames(self, body: bytes, num_chunks: int):
-        num_chunks = max(1, num_chunks)
-        total = len(body)
-        base = total // num_chunks
-        rem = total % num_chunks
-
-        chunks = []
-        pos = 0
-        for i in range(num_chunks):
-            size = base + (1 if i < rem else 0)
-            if size > 0:
-                chunks.append(body[pos:pos + size])
-            pos += size
-
-        frames = []
-        for chunk in chunks:
-            frames.append(f"{len(chunk):x}\r\n".encode("ascii") + chunk + b"\r\n")
-        frames.append(b"0\r\n\r\n")
-        return frames
-
-
-    def make_chunked_headers(self, headers_raw: bytes):
-        text = headers_raw.decode("utf-8", errors="ignore")
-        lines = text.split("\r\n")
-
-        new_lines = []
-        for line in lines:
-            lower = line.lower()
-            if lower.startswith("content-length:"):
-                continue
-            if lower.startswith("transfer-encoding:"):
-                continue
-            new_lines.append(line)
-
-        new_lines.append("Transfer-Encoding: chunked")
-        return ("\r\n".join(new_lines) + "\r\n\r\n").encode("utf-8")
-
-
-    def send_payload_frames(self, template_pkt, frames, start_seq, state, label, delay=0):
-        current_seq = start_seq
-        for idx, frame in enumerate(frames):
-            frag_pkt = template_pkt.copy()
-            if Raw in frag_pkt:
-                del frag_pkt[Raw]
-
-            frag_pkt = frag_pkt / Raw(load=frame)
-            frag_pkt[TCP].seq = current_seq
-            current_seq += len(frame)
-
-            if idx == len(frames) - 1:
-                frag_pkt[TCP].flags |= 0x08
-            else:
-                frag_pkt[TCP].flags &= ~0x08
-
-            del frag_pkt[IP].chksum
-            del frag_pkt[TCP].chksum
-            frag_pkt[IP].len = None
-
-            state["http_chunks_injected"].add((frag_pkt[TCP].seq, len(frame)))
-            send(frag_pkt, verbose=False)
-            print(f"[HTTP Chunks] {label} {idx+1}/{len(frames)} SEQ={frag_pkt[TCP].seq}, LEN={len(frame)}")
-
-            if idx < len(frames) - 1 and delay > 0:
-                time.sleep(delay)
-
-        return current_seq
-
-
-    def remember_original_range(self, state, seq, length):
-        state["http_chunks_original"].add((seq, length))
-        state["http_chunks_original_ranges"].append((seq, seq + length))
-
-
-    def overlaps_original_range(self, state, seq, length):
-        if length <= 0:
-            return False
-        end = seq + length
-        for start, stop in state["http_chunks_original_ranges"]:
-            if seq < stop and end > start:
-                return True
-        return False
-
-
     def manage_packet(self, packet):
         old_p_state = self.p_state
 
@@ -177,25 +94,11 @@ class EvasionProxy:
                 "seq_delta": 0,
                 "established": False,
                 "fragmented_seqs": set(),       # Aggiunto per fragmentation HTTP
-                "injected_fragment_seqs": set(), # Frammenti Scapy gia' pronti: non riframmentare
-                "http_chunks_injected": set(),
-                "http_chunks_original": set(),
-                "http_chunks_original_ranges": [],
-                "http_chunks_pending": False,
-                "http_chunks_body_seq": None,
-                "http_chunks_next_seq": None,
-                "http_chunks_header_delta": 0,
-                "http_chunks_seq_delta": 0,
-                "http_chunks_delta_from": None,
                 "stored_headers": None,         # memorizza gli header HTTP
                 "headers_seq": 0,               # sequence number del pacchetto degli header
             }
         
         state = self.flow_state[fid]
-
-        if self.mutation and self.mutation.field_to_mutate == "http_split" and not scapy_packet.haslayer(Raw):
-            packet.accept()
-            return
 
         # -------------------------------------------------
         # CLIENT -> SERVER (USCITA)
@@ -240,131 +143,7 @@ class EvasionProxy:
                     self.mutation,
                     state
                 )
-
-            # -------------------------------------------------
-            # HTTP CHUNKED TRANSFER ENCODING (Content-Length -> chunked)
-            # -------------------------------------------------
-            if self.mutation and self.mutation.field_to_mutate == "http_chunks":
-                cfg = self.mutation.new_value
-                if isinstance(cfg, str):
-                    cfg = json.loads(cfg)
-
-                num_chunks = int(cfg.get("num_chunks", 3))
-                delay = float(cfg.get("delay_ms", 0)) / 1000.0
-
-                if scapy_packet.haslayer(Raw):
-                    payload = scapy_packet[Raw].load
-                    current_key = (scapy_packet[TCP].seq, len(payload))
-
-                    if current_key in state["http_chunks_injected"]:
-                        state["http_chunks_injected"].discard(current_key)
-                        packet.accept()
-                        return
-
-                    if current_key in state["http_chunks_original"] or self.overlaps_original_range(
-                        state, scapy_packet[TCP].seq, len(payload)
-                    ):
-                        print(f"[HTTP Chunks] Ritrasmissione originale gia' convertita SEQ={scapy_packet[TCP].seq}, LEN={len(payload)}: drop.")
-                        packet.drop()
-                        return
-
-                    sep = b"\r\n\r\n"
-
-                    if state.get("http_chunks_pending") and scapy_packet[TCP].seq == state.get("http_chunks_body_seq"):
-                        body = payload
-                        frames = self.build_chunked_frames(body, num_chunks)
-
-                        packet.drop()
-                        self.send_payload_frames(
-                            scapy_packet,
-                            frames,
-                            state["http_chunks_next_seq"],
-                            state,
-                            "body chunk",
-                            delay
-                        )
-
-                        new_body_len = sum(len(frame) for frame in frames)
-                        delta = state["http_chunks_header_delta"] + new_body_len - len(body)
-                        self.remember_original_range(state, scapy_packet[TCP].seq, len(body))
-                        state["http_chunks_seq_delta"] = delta
-                        state["http_chunks_delta_from"] = scapy_packet[TCP].seq + len(body)
-                        state["http_chunks_pending"] = False
-                        state["http_chunks_body_seq"] = None
-                        state["http_chunks_next_seq"] = None
-                        state["http_chunks_header_delta"] = 0
-
-                        print(f"[HTTP Chunks] Body separato convertito: old_body={len(body)}, new_body={new_body_len}, delta={delta}")
-                        return
-
-                    if sep in payload:
-                        headers_raw, body = payload.split(sep, 1)
-                        headers_text = headers_raw.decode("utf-8", errors="ignore")
-                        method = headers_text.split(" ", 1)[0].upper() if " " in headers_text else ""
-
-                        if method not in ("POST", "PUT", "PATCH"):
-                            packet.accept()
-                            return
-
-                        cl_match = re.search(r"Content-Length:\s*(\d+)", headers_text, re.IGNORECASE)
-                        if not cl_match or int(cl_match.group(1)) <= 0:
-                            packet.accept()
-                            return
-
-                        new_headers = self.make_chunked_headers(headers_raw)
-                        packet.drop()
-
-                        if body:
-                            frames = [new_headers] + self.build_chunked_frames(body, num_chunks)
-                            self.send_payload_frames(
-                                scapy_packet,
-                                frames,
-                                scapy_packet[TCP].seq,
-                                state,
-                                "frame",
-                                delay
-                            )
-
-                            old_payload_len = len(payload)
-                            new_payload_len = sum(len(frame) for frame in frames)
-                            delta = new_payload_len - old_payload_len
-                            self.remember_original_range(state, scapy_packet[TCP].seq, old_payload_len)
-                            state["http_chunks_seq_delta"] = delta
-                            state["http_chunks_delta_from"] = scapy_packet[TCP].seq + old_payload_len
-
-                            print(f"[HTTP Chunks] Header+body convertiti: old={old_payload_len}, new={new_payload_len}, delta={delta}")
-                            return
-
-                        self.send_payload_frames(
-                            scapy_packet,
-                            [new_headers],
-                            scapy_packet[TCP].seq,
-                            state,
-                            "headers",
-                            delay
-                        )
-
-                        self.remember_original_range(state, scapy_packet[TCP].seq, len(payload))
-                        state["http_chunks_pending"] = True
-                        state["http_chunks_body_seq"] = scapy_packet[TCP].seq + len(payload)
-                        state["http_chunks_next_seq"] = scapy_packet[TCP].seq + len(new_headers)
-                        state["http_chunks_header_delta"] = len(new_headers) - len(payload)
-                        state["http_chunks_seq_delta"] = state["http_chunks_header_delta"]
-                        state["http_chunks_delta_from"] = state["http_chunks_body_seq"]
-
-                        print(
-                            f"[HTTP Chunks] Header convertiti, attendo body: "
-                            f"old_headers={len(payload)}, new_headers={len(new_headers)}, "
-                            f"header_delta={state['http_chunks_header_delta']}"
-                        )
-                        return
-
-                if state.get("http_chunks_seq_delta") and state.get("http_chunks_delta_from") is not None:
-                    if scapy_packet[TCP].seq >= state["http_chunks_delta_from"]:
-                        scapy_packet[TCP].seq = (
-                            scapy_packet[TCP].seq + state["http_chunks_seq_delta"]
-                        ) % (2**32)
-             
+            
             # -------------------------------------------------
             # TCP FRAGMENTATION (HTTP BODY SPLIT a Livello 3)
             # -------------------------------------------------
@@ -379,18 +158,6 @@ class EvasionProxy:
                 if scapy_packet.haslayer(Raw):
                     payload = scapy_packet[Raw].load
                     sep = b"\r\n\r\n"
-                    current_key = (scapy_packet[TCP].seq, len(payload))
-
-                    if current_key in state["injected_fragment_seqs"]:
-                        state["injected_fragment_seqs"].discard(current_key)
-                        print(f"[TCP Frag] Frammento iniettato gia' pronto SEQ={scapy_packet[TCP].seq}, LEN={len(payload)}: accetto.")
-                        packet.accept()
-                        return
-
-                    if current_key in state["fragmented_seqs"]:
-                        print(f"[TCP Frag] Ritrasmissione del body originale gia' frammentato SEQ={scapy_packet[TCP].seq}, LEN={len(payload)}: drop.")
-                        packet.drop()
-                        return
 
                     # --- CASO 1: pacchetto che contiene solo gli header (termina con \r\n\r\n) ---
                     if sep in payload and payload.endswith(sep):
@@ -456,7 +223,7 @@ class EvasionProxy:
                         packet.drop()
 
                         # Il body inizia dopo gli header già inviati
-                        body_start_seq = scapy_packet[TCP].seq
+                        body_start_seq = state["stored_headers_seq"] + state["headers_payload_len"]
                         current_seq = body_start_seq
                         print(f"[TCP Frag] SEQ iniziale per il body: {body_start_seq}")
 
@@ -479,7 +246,6 @@ class EvasionProxy:
                             del frag_pkt[TCP].chksum
                             frag_pkt[IP].len = None
 
-                            state["injected_fragment_seqs"].add((frag_pkt[TCP].seq, len(frag)))
                             send(frag_pkt, verbose=False)
                             print(f"  Inviato frammento {idx+1}: SEQ={frag_pkt[TCP].seq}, LEN={len(frag)}, PSH={'SI' if idx == len(body_frags)-1 else 'NO'}")
                             if idx < len(body_frags) - 1 and delay > 0:
@@ -506,20 +272,6 @@ class EvasionProxy:
         else:
             # Deleghiamo la traduzione inversa al protocol_mutator!
             scapy_packet = apply_inbound_translation(scapy_packet, state)
-
-            if state.get("http_chunks_seq_delta") and state.get("http_chunks_delta_from") is not None:
-                delta = state["http_chunks_seq_delta"]
-                delta_from = state["http_chunks_delta_from"]
-                chunked_end = delta_from + delta
-
-                if scapy_packet[TCP].flags & 0x10:
-                    old_ack = scapy_packet[TCP].ack
-                    if delta > 0 and delta_from < scapy_packet[TCP].ack < chunked_end:
-                        scapy_packet[TCP].ack = delta_from
-                    elif scapy_packet[TCP].ack >= chunked_end:
-                        scapy_packet[TCP].ack = (scapy_packet[TCP].ack - delta) % (2**32)
-                    if old_ack != scapy_packet[TCP].ack:
-                        print(f"[HTTP Chunks] ACK tradotto: {old_ack} -> {scapy_packet[TCP].ack} (delta={delta})")
         
 
         # -------------------------------------------------
