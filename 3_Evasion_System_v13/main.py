@@ -48,6 +48,10 @@ def orchestrator_loop(proxy):
             l7_mutations["user_agent"] = test_state["user_agent"]
         if "accept_language" in test_state:
             l7_mutations["accept_language"] = test_state["accept_language"]
+        if "referer" in test_state:
+            l7_mutations["referer"] = test_state["referer"]
+        if "content_type" in test_state:
+            l7_mutations["content_type"] = test_state["content_type"]
         if "http_split" in test_state:
             l7_mutations["http_split"] = test_state["http_split"]
 
@@ -70,6 +74,8 @@ def orchestrator_loop(proxy):
             proxy.p_state.seq_num = test_state["seq_num"]
         if "ip_id" in test_state:
             proxy.p_state.ip_id = test_state["ip_id"]
+        if "flags" in test_state:
+            proxy.p_state.flags = test_state["flags"]
 
         proxy.mutation = strategy
 
@@ -150,6 +156,15 @@ def orchestrator_loop(proxy):
         
         if "user_agent" not in active_mutations and proxy.p_state.user_agent != "":
             active_mutations["user_agent"] = proxy.p_state.user_agent
+        
+        if "referer" not in active_mutations and proxy.p_state.referer != "":
+            active_mutations["referer"] = proxy.p_state.referer
+
+        if "content_type" not in active_mutations and proxy.p_state.content_type != "":
+            active_mutations["content_type"] = proxy.p_state.content_type
+        
+        if "accept_language" not in active_mutations and proxy.p_state.accept_language != "":
+            active_mutations["accept_language"] = proxy.p_state.accept_language
 
         print(f"Startegy active: {active_mutations}")
 

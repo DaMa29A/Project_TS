@@ -33,23 +33,37 @@ class EvasionProxy:
         if self.p_state.seq_num == 0:
             self.p_state.seq_num = pk[TCP].seq
         
+        if self.p_state.ip_id == 0:
+            self.p_state.ip_id = pk[IP].id
+            #print(f"id: {pk[IP].id}")
+        
         if self.p_state.user_agent == "" and pk.haslayer(Raw):
             try:
                 # Decodifichiamo il payload in testo ignorando i caratteri non validi
                 payload = pk[Raw].load.decode('utf-8', errors='ignore')
                 
                 # Cerchiamo la riga che inizia con "User-Agent:"
-                match = re.search(r'User-Agent:\s*(.+)\r\n', payload)
-                if match:
-                    self.p_state.user_agent = match.group(1).strip()
-                    print(f"[Proxy] Baseline User-Agent catturato: {self.p_state.user_agent}")
+                if self.p_state.user_agent == "":
+                    match = re.search(r'User-Agent:\s*(.+)\r\n', payload)
+                    if match:
+                        self.p_state.user_agent = match.group(1).strip()
+                        #print(f"[Proxy] Baseline User-Agent catturato: {self.p_state.user_agent}")
+                if self.p_state.referer == "":
+                    match = re.search(r'Referer:\s*(.+)\r\n', payload, re.IGNORECASE)
+                    if match:
+                        self.p_state.referer = match.group(1).strip()
+                        #print(f"[Proxy] Baseline Referer catturato: {self.p_state.referer}")
+                if self.p_state.content_type == "":
+                    match = re.search(r'Content-Type:\s*(.+)\r\n', payload, re.IGNORECASE)
+                    if match:
+                        self.p_state.content_type = match.group(1).strip()
+                if self.p_state.accept_language == "":
+                    match = re.search(r'Accept-Language:\s*(.+)\r\n', payload, re.IGNORECASE)
+                    if match:
+                        self.p_state.accept_language = match.group(1).strip()
             except Exception:
                 pass
-        
-        if self.p_state.ip_id == 0:
-            self.p_state.ip_id = pk[IP].id
-            print(f"id: {pk[IP].id}")
-    
+         
 
     def get_flow_id(self, pkt):
         if pkt[IP].dst == TARGET_IP:
@@ -93,13 +107,22 @@ class EvasionProxy:
 
                 match self.mutation.field_to_mutate:
                     case "ttl":
-                        self.p_state.ttl = self.mutation.new_value
+                        self.p_state.ttl = int(self.mutation.new_value)
                     case "win_size":
-                        self.p_state.win_size = self.mutation.new_value
+                        self.p_state.win_size = int(self.mutation.new_value)
                     case "seq_num":
-                        self.p_state.seq_num = self.mutation.new_value
+                        self.p_state.seq_num = int(self.mutation.new_value)
                     case "ip_id":
                         self.p_state.ip_id = int(self.mutation.new_value)
+                    case "flags":
+                        flags_value = self.mutation.new_value
+                        if isinstance(flags_value, str):
+                            try:
+                                flags_value = json.loads(flags_value)
+                            except json.JSONDecodeError:
+                                print(f"[!] Errore parsing JSON per flags: {flags_value}")
+                                flags_value = {}
+                        self.p_state.flags = flags_value
                     case _: # 'default'
                         pass
             
@@ -108,7 +131,7 @@ class EvasionProxy:
                     
                 # print(f"[Proxy] Applico strategia: {self.mutation.field_to_mutate} -> {self.mutation.new_value}")
                 
-                print(f"DEBUG ip_id type: {type(self.p_state.ip_id)}, value: {self.p_state.ip_id}")
+                #print(f"DEBUG ip_id type: {type(self.p_state.ip_id)}, value: {self.p_state.ip_id}")
 
                 # Deleghiamo la modifica al protocol_mutator!
                 scapy_packet = apply_outbound_mutations(
@@ -117,6 +140,26 @@ class EvasionProxy:
                     self.mutation,
                     state
                 )
+            
+            # In EvasionProxy.manage_packet, dopo aver ottenuto scapy_packet già mutato
+            if self.mutation and self.mutation.field_to_mutate == "http_split":
+                cfg = self.mutation.new_value
+                if isinstance(cfg, str):
+                    cfg = json.loads(cfg)
+                num_chunk = cfg.get("num_chunks", 100)
+                print(f"HTTP-SPLIT IN EVASION PROXY -- num_chunk: {num_chunk}")
+
+                # Se il pacchetto ha payload e il TCP non è un puro ACK
+                if scapy_packet.haslayer(Raw) and (scapy_packet[TCP].flags & 0x08):
+                    #payload= b'33\r\n   b\r\nusername=ad\r\na\r\nmin&passwo\r\na\r\nrd=test123\r\n0\r\n\r\n   \r\n0\r\n\r\n'
+                    payload = bytes(scapy_packet[Raw])
+                    if b'Transfer-Encoding: chunked' not in payload and b'\r\n0\r\n\r\n' in payload:
+                    # È il pacchetto con il corpo chunked (non gli header)
+                        #print(f"HTTP-SPLIT IN EVASION PROXY -- payload: {payload}")
+                        print("NFQUEUE LEN:", len(payload))
+                        print(payload)
+             
+  
         
         # -------------------------------------------------
         # SERVER -> CLIENT (ENTRATA)
@@ -130,34 +173,27 @@ class EvasionProxy:
         # JITTER (ritardo tra pacchetti con distribuzione di Poisson)
         # -------------------------------------------------
         if self.mutation and self.mutation.field_to_mutate == "jitter":
-            config = self.mutation.new_value
-            if isinstance(config, str):
-                try:
-                    config = json.loads(config)
-                except json.JSONDecodeError:
-                    config = {}
-            mean_ms = config.get("mean_delay_ms", 20)  # media in millisecondi
+            mean_ms = float(self.mutation.new_value)   # media in millisecondi [Da 5 a 100 come valore]
             if mean_ms > 0:
                 # Distribuzione esponenziale (Poisson process)
                 delay_sec = random.expovariate(1.0 / (mean_ms / 1000.0))
                 delay_sec = min(delay_sec, 0.5)  # max 500 ms
                 print(f"[Jitter] Ritardo di {delay_sec*1000:.2f} ms (mean={mean_ms}ms)")
                 time.sleep(delay_sec)
+            #self.p_state.jitter = mean_ms
         
         # -------------------------------------------------
         # Retransmission simulation (packet loss)
         # -------------------------------------------------
         if self.mutation and self.mutation.field_to_mutate == "retransmit":
-            cfg = self.mutation.new_value
-            if isinstance(cfg, str):
-                cfg = json.loads(cfg)
-            drop_prob = cfg.get("drop_probability", 0.1)
+            drop_prob = float(self.mutation.new_value) #drop_probability
             # Evita di droppare pacchetti critici (SYN, FIN, RST)
             if not (scapy_packet[TCP].flags & 0x07):
                 if random.random() < drop_prob:
                     print(f"[Retransmit] Pacchetto droppato (simulata perdita), TCP ritrasmetterà")
                     packet.drop()
                     return
+            #self.p_state.jitter = drop_prob
 
         # -------------------------------------------------
         # RICALCOLO CHECKSUM E RILASCIO

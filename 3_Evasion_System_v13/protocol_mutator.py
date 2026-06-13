@@ -39,11 +39,15 @@ def apply_outbound_mutations(scapy_packet, p_state, mutation, flow_state):
             tcp.seq = (tcp.seq + flow_state["seq_delta"]) % MOD
     
     # ------- Modifica Flags ------- 
+    print("aaaa")
     if (mutation.field_to_mutate == "flags"):
+        print(f"FLAGS DEBUG -- \nScapyPacket:{scapy_packet}\nmutation:{mutation}")
         has_payload = len(scapy_packet[TCP].payload) > 0 if Raw in scapy_packet else False
+        print(f"HasPAyload: {has_payload}")
         new_flags = apply_tcp_flags_mutation(tcp, p_state.flags, flow_state, has_payload)
         tcp.flags = new_flags
-        print(f"[Mutator] TCP flags: {p_state.flags['action']} -> {new_flags:02x}")
+        print(f"[Mutator] TCP flags: {p_state.flags['action']} -> {int(new_flags):02x}")
+        #print(f"[Mutator] TCP flags: {p_state.flags['action']} -> {new_flags:02x}")
 
     return scapy_packet
 

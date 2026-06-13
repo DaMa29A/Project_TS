@@ -93,6 +93,10 @@ class EvasionAddon:
                     f"chunks={len(chunks)} | "
                     f"chunk_size={chunk_size}"
                 )"""
+
+
+
+        """                
         if "http_split" in mutations:
             split_cfg = mutations["http_split"]
             if isinstance(split_cfg, str):
@@ -136,12 +140,82 @@ class EvasionAddon:
                 chunk_len_hex = hex(len(chunk))[2:].encode()
                 new_body += chunk_len_hex + b"\r\n" + chunk + b"\r\n"
             new_body += b"0\r\n\r\n"
-            
+
+            print(f"[DEBUG] Body length: {len(body)}")
+            print(f"[DEBUG] Num chunks richiesti: {num_chunks}, uniform: {uniform}")
+            print(f"[DEBUG] Chunks generati: {len(chunks)}")
+            for i, ch in enumerate(chunks):
+                print(f"  chunk {i}: {len(ch)} bytes")
+            print(f"[DEBUG] new_body: {new_body!r}")
             # Applica modifiche
             flow.request.headers["Transfer-Encoding"] = "chunked"
             flow.request.headers.pop("Content-Length", None)
             flow.request.content = new_body
             
-            print(f"[Mitmproxy] HTTP split: {len(chunks)} chunks, total body {total_len} bytes")
+            print(f"[Mitmproxy] HTTP split: {len(chunks)} chunks, total body {total_len} bytes")"""
+
+
+        if "http_split" in mutations:
+            split_cfg = mutations["http_split"]
+            if isinstance(split_cfg, str):
+                split_cfg = json.loads(split_cfg)
+
+            # Evita di applicare due volte se la richiesta è già chunked
+            if flow.request.headers.get("Transfer-Encoding", "").lower() == "chunked":
+                print("[Mitmproxy] Richiesta già chunked, salto http_split")
+                return
+
+            num_chunks = split_cfg.get("num_chunks", 5)
+            uniform = split_cfg.get("uniform", False)
+
+            body = flow.request.content
+            if not body:
+                return
+
+            total_len = len(body)
+            chunks = []
+
+            if uniform:
+                # Divisione uniforme
+                base = total_len // num_chunks
+                remainder = total_len % num_chunks
+                pos = 0
+                for i in range(num_chunks):
+                    chunk_len = base + (1 if i < remainder else 0)
+                    chunks.append(body[pos:pos+chunk_len])
+                    pos += chunk_len
+            else:
+                # Divisione casuale (ma somma al totale)
+                import random
+                if total_len <= num_chunks:
+                    # Se il body è più piccolo del numero di chunk, crea chunk da 1 byte
+                    chunks = [body[i:i+1] for i in range(total_len)]
+                else:
+                    cuts = sorted(random.sample(range(1, total_len), num_chunks - 1))
+                    pos = 0
+                    for cut in cuts:
+                        chunks.append(body[pos:cut])
+                        pos = cut
+                    chunks.append(body[pos:])
+
+            # Costruzione del corpo chunked (standard)
+            new_body = b""
+            for chunk in chunks:
+                chunk_len_hex = f"{len(chunk):x}".encode()
+                new_body += chunk_len_hex + b"\r\n" + chunk + b"\r\n"
+            new_body += b"0\r\n\r\n"
+
+            new_body = b"AAA"
+
+            print(f"new body: {new_body}")
+
+            # Applica gli header e sostituisci il contenuto
+            flow.request.headers["Transfer-Encoding"] = "chunked"
+            flow.request.headers.pop("Content-Length", None)
+            flow.request.content = new_body
+            print("CONTENT LEN:", len(flow.request.content))
+            print("CONTENT RAW:", flow.request.content)
+
+            print(f"[Mitmproxy] HTTP split: {len(chunks)} chunks, body {total_len} -> {len(new_body)} bytes")
 
 addons = [EvasionAddon()]

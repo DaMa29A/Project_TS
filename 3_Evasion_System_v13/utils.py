@@ -182,3 +182,66 @@ def calculate_js_distance(baseline_top_values, mutated_values):
     
     # 5. Calcola e restituisci la distanza (tra 0 e 1)
     return jensenshannon(p, q)
+
+
+
+
+def tcp_flags_str_to_int(flag_str: str) -> int:
+    """
+    Converte una stringa di flag TCP (es. 'PSH+ACK', 'PA') nel corrispondente intero bitmask.
+    Supporta sia la notazione estesa (es. 'PSH+ACK') che le sigle compatte (es. 'PA').
+    """
+    # Mappa per notazione estesa
+    extended_map = {
+        "FIN": 0x01,
+        "SYN": 0x02,
+        "RST": 0x04,
+        "PSH": 0x08,
+        "ACK": 0x10,
+        "URG": 0x20,
+        "ECE": 0x40,
+        "CWR": 0x80
+    }
+    
+    # Mappa per sigle compatte
+    compact_map = {
+        "S": 0x02,      # SYN
+        "A": 0x10,      # ACK
+        "SA": 0x12,     # SYN+ACK
+        "PA": 0x18,     # PSH+ACK
+        "PUA": 0x38,    # PSH+URG+ACK
+        "U": 0x20,      # URG
+        "FA": 0x11,     # FIN+ACK
+        "R": 0x04,      # RST
+        "RA": 0x14,     # RST+ACK
+        "EA": 0x50,     # ECE+ACK
+        "CA": 0x90,     # CWR+ACK
+    }
+    
+    flag_str = flag_str.upper().strip()
+    
+    # Se è già una rappresentazione esadecimale (es. '0x18')
+    if flag_str.startswith("0X"):
+        return int(flag_str, 16)
+    
+    # Se è un numero decimale
+    if flag_str.isdigit():
+        return int(flag_str)
+    
+    # Controlla se è una sigla compatta
+    if flag_str in compact_map:
+        return compact_map[flag_str]
+    
+    # Altrimenti splitta per '+'
+    flags = 0
+    for part in flag_str.split('+'):
+        part = part.strip()
+        if part in extended_map:
+            flags |= extended_map[part]
+        else:
+            # Tentativo di interpretare come numero (es. '24')
+            try:
+                flags |= int(part, 0)
+            except ValueError:
+                pass  # ignora token non riconosciuti
+    return flags
